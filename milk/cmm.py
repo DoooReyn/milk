@@ -1,6 +1,5 @@
 import ctypes
-import traceback
-from os import getenv, listdir, makedirs
+from os import listdir, makedirs
 from os.path import join, splitext, isdir, abspath
 from pathlib import Path
 from shutil import rmtree
@@ -8,26 +7,54 @@ from traceback import format_exc, print_exc
 
 import win32api
 import win32con
-import win32gui
-from PyQt5.QtCore import QUrl
+from PyQt5.QtCore import QUrl, QStandardPaths
 from PyQt5.QtGui import QDesktopServices
 from PyQt5.QtWidgets import QMessageBox
+from win32gui import SystemParametersInfo
 
 from conf.settings import Settings
+
+
+class TraceBack:
+    def __init__(self, clear=False):
+        date = datetime.date(datetime.now())
+        self.__save_at = Path(Cmm.app_cache_dir()).joinpath(
+            f"{date}.log")
+        if clear:
+            self.clear()
+        self.start()
+
+    def clear(self):
+        with open(self.__save_at, "wt", encoding="utf-8") as fb:
+            fb.write("")
+
+    def start(self):
+        equal = "=" * 40
+        self.save(f"\n{equal}start{equal}\n")
+
+    def trace_back(self):
+        stack = format_exc(limit=10)
+        date = datetime.now()
+        stack = f"{date}\n{stack}\n"
+        self.save(stack)
+
+    def save(self, text: str):
+        with open(self.__save_at, "at", encoding="utf-8") as fb:
+            fb.write(text)
 
 
 class Cmm:
     @staticmethod
     def local_cache_dir():
-        return getenv("LOCALAPPDATA")
+        return QStandardPaths.writableLocation(QStandardPaths.AppConfigLocation)
 
     @staticmethod
     def local_temp_dir():
-        return getenv("TEMP")
+        return QStandardPaths.writableLocation(QStandardPaths.TempLocation)
 
     @staticmethod
     def user_root_dir():
-        return getenv("USERPROFILE")
+        return QStandardPaths.writableLocation(QStandardPaths.HomeLocation)
 
     @staticmethod
     def app_cache_dir():
@@ -35,11 +62,11 @@ class Cmm:
 
     @staticmethod
     def user_picture_dir():
-        return join(Cmm.user_root_dir(), "Pictures")
+        return QStandardPaths.writableLocation(QStandardPaths.PicturesLocation)
 
     @staticmethod
     def user_document_dir():
-        return join(Cmm.user_root_dir(), "Documents")
+        return QStandardPaths.writableLocation(QStandardPaths.DocumentsLocation)
 
     @staticmethod
     def create_app_cache_dir():
@@ -75,6 +102,7 @@ class Cmm:
         for d in listdir(root):
             rmtree(join(root, d), ignore_errors=True)
 
+    # noinspection PyBroadException
     @staticmethod
     def get_screensize(multiplier=1):
         try:
@@ -88,44 +116,17 @@ class Cmm:
             print(f"\r[-] Status: Encountered some problems while detecting your display size.", end="")
             print_exc()
 
+    # noinspection PyBroadException
     @staticmethod
     def set_wallpaper(path):
         try:
             key = win32api.RegOpenKeyEx(win32con.HKEY_CURRENT_USER, "Control Panel\\Desktop", 0, win32con.KEY_SET_VALUE)
             win32api.RegSetValueEx(key, "WallpaperStyle", 0, win32con.REG_SZ, "10")
             win32api.RegSetValueEx(key, "TileWallpaper", 0, win32con.REG_SZ, "0")
-            win32gui.SystemParametersInfo(win32con.SPI_SETDESKWALLPAPER, abspath(path), win32con.SPIF_SENDWININICHANGE)
+            SystemParametersInfo(win32con.SPI_SETDESKWALLPAPER, abspath(path), win32con.SPIF_SENDWININICHANGE)
             win32api.RegCloseKey(key)
-        except:
-            traceback.print_exc()
-
-
-class TraceBack:
-    def __init__(self, clear=False):
-        date = datetime.date(datetime.now())
-        self.__save_at = Path(Cmm.app_cache_dir()).joinpath(
-            f"{date}.log")
-        if clear:
-            self.clear()
-        self.start()
-
-    def clear(self):
-        with open(self.__save_at, "wt", encoding="utf-8") as fb:
-            fb.write("")
-
-    def start(self):
-        equal = "=" * 40
-        self.save(f"\n{equal}start{equal}\n")
-
-    def trace_back(self):
-        stack = format_exc(limit=10)
-        date = datetime.now()
-        stack = f"{date}\n{stack}\n"
-        self.save(stack)
-
-    def save(self, text: str):
-        with open(self.__save_at, "at", encoding="utf-8") as fb:
-            fb.write(text)
+        except Exception:
+            TraceBack().trace_back()
 
 
 class MsgBox:
@@ -137,9 +138,9 @@ class MsgBox:
     def msg(msg_text: str, title: str = "Tips", detail: str = "", ico=QMessageBox.Information):
         return MsgBox.makeBox(msg_text, title, detail, ico, QMessageBox.Ok)
 
+    # noinspection PyBroadException
     @staticmethod
     def makeBox(msg_text: str, title: str = "", detail: str = "", ico=QMessageBox.Information, style=QMessageBox.Ok):
-        # noinspection PyBroadException
         try:
             msg = QMessageBox()
             msg.setIcon(ico)
