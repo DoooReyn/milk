@@ -1,4 +1,5 @@
 import re
+import time
 from os import walk, makedirs
 from os.path import isdir, splitext, join, dirname, exists
 from shutil import rmtree
@@ -9,6 +10,7 @@ from PyQt5.QtWidgets import QWidget, QLineEdit, QPushButton, QFileDialog
 
 from milk.conf import Lang, LangUI, settings, UserKey, signals, UIDef
 from .ui_base import UIBase
+from milk.cmm import StoppableThread
 
 
 class SpineAtlasExtractor(UIBase):
@@ -85,6 +87,7 @@ class SpineAtlasExtractor(UIBase):
             self.ui_edit_atlas_out_dir.focusWidget()
             return
 
+        self.reset_ui(False)
         self._parse(atlas_locate_dir, atlas_out_dir)
 
     def _parse(self, locate, out):
@@ -100,10 +103,24 @@ class SpineAtlasExtractor(UIBase):
         if len(file_no) <= 0:
             signals.logger_error.emit(LangUI.msg_atlas_not_found)
         else:
-            for item in file_no:
-                self._parse_file(item[0], item[1])
-            signals.logger_info.emit(LangUI.msg_all_extracted.format(locate))
-            signals.window_switch_to_main.emit()
+            def _run():
+                while len(file_no) > 0:
+                    src, dst = file_no.pop()
+                    self._parse_file(src, dst)
+                    time.sleep(1)
+                self.thread.stop()
+                self.thread = None
+                self.reset_ui(True)
+                signals.logger_info.emit(LangUI.msg_all_extracted.format(locate))
+                signals.window_switch_to_main.emit()
+            self.thread = StoppableThread(target=_run)
+            self.thread.daemon = True
+            self.thread.start()
+
+    def reset_ui(self, ok: bool):
+        self.ui_btn_atlas_choose.setEnabled(ok)
+        self.ui_btn_out_choose.setEnabled(ok)
+        self.ui_btn_parse.setEnabled(ok)
 
     # noinspection PyMethodMayBeStatic
     def _parse_file(self, src_file, dst_dir):
@@ -167,7 +184,6 @@ class SpineAtlasExtractor(UIBase):
             signals.logger_info.emit(LangUI.msg_one_extracted.format(src_file))
         except Exception as e:
             signals.logger_error.emit(str(e))
-            signals.window_switch_to_main.emit()
         finally:
             src_atlas.close()
 

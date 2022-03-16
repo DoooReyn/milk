@@ -3,6 +3,7 @@ from os import listdir, makedirs
 from os.path import join, splitext, isdir, abspath
 from pathlib import Path
 from shutil import rmtree
+from threading import Thread, Event
 from traceback import format_exc, print_exc
 
 import win32api
@@ -13,6 +14,18 @@ from PyQt5.QtWidgets import QMessageBox
 from win32gui import SystemParametersInfo
 
 from conf.settings import Settings
+
+
+class StoppableThread(Thread):
+    def __init__(self, **kwargs):
+        super(StoppableThread, self).__init__(**kwargs)
+        self._stop_event = Event()
+
+    def stop(self):
+        self._stop_event.set()
+
+    def stopped(self):
+        return self._stop_event.is_set()
 
 
 class TraceBack:
