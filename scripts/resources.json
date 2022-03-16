@@ -1,0 +1,9 @@
+{
+  "qrc": "./resources.qrc",
+  "out": "../milk/conf/resources.py",
+  "map": "../milk/conf/res_map.py",
+  "root": "statics",
+  "dirs": [
+    "img"
+  ]
+}
