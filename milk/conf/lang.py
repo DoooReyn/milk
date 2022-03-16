@@ -16,7 +16,7 @@ Lang = dict({
     "item_image_bmfont": "BMFont生成工具",
     "item_image_sprite_sheet": "序列帧动画",
     "item_image_spine": "Spine骨骼动画",
-    "item_image_spine_atlas_extractor": "Spine Atlas 拆图器",
+    "item_image_spine_atlas_extractor": "Spine Atlas 提取器",
 
     "menu_config": "配置",
     "item_config_i18n": "多语言配置",
