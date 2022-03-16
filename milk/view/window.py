@@ -8,6 +8,7 @@ from milk.conf import Settings, Lang, LangUI, signals, UIDef
 from .main_ui import MainUI
 from view.wallpaper import UnsplashWallPaper
 from view.about_me import AboutMe
+from view.spine_atlas_extractor import SpineAtlasExtractor
 
 
 class Window(QMainWindow):
@@ -18,8 +19,9 @@ class Window(QMainWindow):
         self.set_ui()
         self.setup_signals()
 
-        self.win_wallpaper: Union[UnsplashWallPaper, None] = None
-        self.win_about_me: Union[AboutMe, None] = None
+        self.windows = {}
+        for item in UIDef:
+            self.windows.setdefault(item.name, None)
 
     def setup_signals(self):
         signals.window_closed.connect(self.on_sub_window_closed)
@@ -28,12 +30,13 @@ class Window(QMainWindow):
     def on_switch_to_main(self):
         self.activateWindow()
 
-    def on_sub_window_closed(self, win):
-        code = UIDef(win)
-        if code == UIDef.ToolsWallpaper:
-            self.win_wallpaper = None
-        if code == UIDef.FileAboutMe:
-            self.win_about_me = None
+    def on_sub_window_closed(self, win_code):
+        win_def = UIDef(win_code)
+        win = self.windows[win_def.name]
+        if win is not None:
+            self.windows[win_def.name] = None
+        else:
+            signals.logger_fatal.emit("{0} not closed!".format(win_def.name))
 
     def setup(self):
         self.resize(Settings.Sizes.ori_width, Settings.Sizes.ori_height)
@@ -95,46 +98,36 @@ class Window(QMainWindow):
         QApplication.aboutQt()
 
     def on_menu_open_about_me(self):
-        if self.win_about_me is not None:
-            self.win_about_me.activateWindow()
-            return
-        self.win_about_me = AboutMe()
-        self.win_about_me.show()
+        self.open_menu(UIDef.FileAboutMe, AboutMe)
 
     @staticmethod
     def on_menu_exit_app():
         QApplication.exit(0)
 
-    def on_menu_image_split(self):
-        if self.win_wallpaper is not None:
-            self.win_wallpaper.activateWindow()
+    def open_menu(self, ui: UIDef, class_obj):
+        win = self.windows[ui.name]
+        if win is not None:
+            win.activateWindow()
             return
-        self.win_wallpaper = UnsplashWallPaper()
-        self.win_wallpaper.show()
+        self.windows[ui.name] = class_obj()
+        self.windows[ui.name].show()
+
+    def on_menu_image_split(self):
+        self.open_menu(UIDef.ToolsWallpaper, UnsplashWallPaper)
 
     def on_menu_image_compress(self):
-        if self.win_wallpaper is not None:
-            self.win_wallpaper.activateWindow()
-            return
-        self.win_wallpaper = UnsplashWallPaper()
-        self.win_wallpaper.show()
+        self.open_menu(UIDef.ToolsWallpaper, UnsplashWallPaper)
 
     def on_menu_image_texture_packer(self):
-        if self.win_wallpaper is not None:
-            self.win_wallpaper.activateWindow()
-            return
-        self.win_wallpaper = UnsplashWallPaper()
-        self.win_wallpaper.show()
+        self.open_menu(UIDef.ToolsWallpaper, UnsplashWallPaper)
+
+    def on_menu_image_spine_atlas_extractor(self):
+        self.open_menu(UIDef.ImageSpineAtlasExtractor, SpineAtlasExtractor)
 
     def on_menu_tools_random_wallpaper(self):
-        if self.win_wallpaper is not None:
-            self.win_wallpaper.activateWindow()
-            return
-        self.win_wallpaper = UnsplashWallPaper()
-        self.win_wallpaper.show()
+        self.open_menu(UIDef.ToolsWallpaper, UnsplashWallPaper)
 
     def closeEvent(self, evt):
-        if self.win_wallpaper:
-            self.win_wallpaper.close()
-        if self.win_about_me:
-            self.win_about_me.close()
+        for key, win in self.windows.items():
+            if win is not None:
+                win.close()

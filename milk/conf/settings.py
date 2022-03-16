@@ -99,6 +99,11 @@ class Settings:
                     "icon": ResMap.img_preview_open
                 },
                 {
+                    "name": "item_image_spine_atlas_extractor",
+                    "trigger": "on_menu_image_spine_atlas_extractor",
+                    "icon": ResMap.img_split_branch
+                },
+                {
                     "name": "item_image_bmfont",
                     "trigger": "on_menu_image_bmfont",
                     "icon": ResMap.img_add_text_two
@@ -242,6 +247,10 @@ class UserKey:
         log_warn = "log_warn"
         log_error = "log_error"
         log_fatal = "log_fatal"
+
+    class SpineAtlasExtractor:
+        atlas_locate_dir = "atlas_locate_dir"
+        atlas_out_dir = "atlas_out_dir"
 
 
 local_dir = QStandardPaths.writableLocation(QStandardPaths.AppConfigLocation)

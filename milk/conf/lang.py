@@ -16,6 +16,7 @@ Lang = dict({
     "item_image_bmfont": "BMFont生成工具",
     "item_image_sprite_sheet": "序列帧动画",
     "item_image_spine": "Spine骨骼动画",
+    "item_image_spine_atlas_extractor": "Spine Atlas 拆图器",
 
     "menu_config": "配置",
     "item_config_i18n": "多语言配置",
@@ -58,6 +59,9 @@ class LangUI:
     msg_download_wallpaper_failed = "下载失败：{0}."
     msg_enabled = "已启用"
     msg_disabled = "已禁用"
+    msg_atlas_not_found = "Spine Atlas 文件未找到，请检查目录是否正确"
+    msg_all_extracted = "[{0}] 全部提取完成！"
+    msg_one_extracted = "[{0}] 提取完成！"
 
     main_ui_btn_clear = "清空"
     main_ui_lab_log_level = "—————"
@@ -81,4 +85,7 @@ class LangUI:
     wallpaper_ui_btn_download = "设为壁纸"
     wallpaper_ui_msg_title = "下载文件"
 
-    about_me_ui_lab_1 = ""
+    atlas_extractor_ui_edit_atlas_dir = "请选择 Spine Atlas 所在目录"
+    atlas_extractor_ui_edit_out_dir = "请选择碎图输出目录"
+    atlas_extractor_ui_btn_choose = "选择"
+    atlas_extractor_ui_btn_parse = "解析"

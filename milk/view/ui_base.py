@@ -29,7 +29,7 @@ class UIBase(QWidget):
 
     @property
     def default_layout_spacing(self):
-        return 10
+        return 8
 
     @property
     def default_button_size(self):
@@ -104,6 +104,7 @@ class UIBase(QWidget):
         parent.layout().addWidget(child)
         return child
 
+    # noinspection PyMethodMayBeStatic
     def add_progress_bar(self, parent: QWidget):
         child = QProgressBar()
         parent.layout().addWidget(child)

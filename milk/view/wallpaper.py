@@ -9,7 +9,7 @@ from unsplash.api import Api
 from unsplash.auth import Auth
 
 from milk.cmm import Cmm
-from milk.conf import settings, UserKey, signals, UIDef, LangUI
+from milk.conf import settings, UserKey, signals, UIDef, LangUI, Lang
 from milk.view.ui_base import UIBase
 
 
@@ -66,6 +66,7 @@ class UnsplashWallPaper(UIBase):
 
         self.ui_lab_image = self.add_label("", self)
 
+        self.setWindowTitle(Lang.get("item_tools_random_wallpaper"))
         self.ui_public_key.setText(settings.value(UserKey.Wallpaper.public_key, ""))
         self.ui_private_key.setText(settings.value(UserKey.Wallpaper.private_key, ""))
         self.ui_redirect_uri.setText(settings.value(UserKey.Wallpaper.redirect_uri, ""))

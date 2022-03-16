@@ -6,35 +6,36 @@ class UIDef(Enum):
     FileAboutMe = 1
     FileHelp = 2
 
-    ImageSplit = 11
-    ImageCompress = 12
-    ImageTexturePacker = 13
-    ImageTextureUnpacker = 14
-    ImageIconGenerator = 15
-    ImageSpriteSheet = 16
-    ImageSpine = 17
-    ImageBMFont = 18
+    ImageSplit = 101
+    ImageCompress = 102
+    ImageTexturePacker = 103
+    ImageTextureUnpacker = 104
+    ImageIconGenerator = 105
+    ImageSpriteSheet = 106
+    ImageSpine = 107
+    ImageBMFont = 108
+    ImageSpineAtlasExtractor = 109
 
-    ConfigI18n = 21
-    ConfigXlsx = 22
+    ConfigI18n = 201
+    ConfigXlsx = 202
 
-    ToolsTranslate = 31
-    ToolsRename = 32
-    ToolsTodos = 33
-    ToolsWallpaper = 34
-    ToolsAudio = 35
-    ToolsVarName = 36
-    ToolsPlistMinifier = 37
+    ToolsTranslate = 301
+    ToolsRename = 302
+    ToolsTodos = 303
+    ToolsWallpaper = 304
+    ToolsAudio = 305
+    ToolsVarName = 306
+    ToolsPlistMinifier = 307
 
-    LuaGrammarChecker = 41
-    LuaEncodingChecker = 42
-    LuaCrypto = 43
-    LuaMinifier = 44
-    LuaGarbage = 45
+    LuaGrammarChecker = 401
+    LuaEncodingChecker = 402
+    LuaCrypto = 403
+    LuaMinifier = 404
+    LuaGarbage = 405
 
-    DocCocos2dx = 51
-    DocCocosCreator = 52
-    DocLua = 53
-    DocPython = 54
-    DocTypeScript = 55
-    DocQt = 56
+    DocCocos2dx = 501
+    DocCocosCreator = 502
+    DocLua = 503
+    DocPython = 504
+    DocTypeScript = 505
+    DocQt = 506
