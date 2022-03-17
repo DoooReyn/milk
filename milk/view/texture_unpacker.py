@@ -1,17 +1,17 @@
-import os
 import plistlib
 import re
+from os import remove
 from os.path import basename, dirname, join, exists, abspath
 from typing import Union
 
 from PIL import Image
 from PyQt5.QtCore import pyqtSignal, QRectF, Qt
-from PyQt5.QtGui import QPixmap, QPen, QBrush, QColor
+from PyQt5.QtGui import QPixmap, QPen, QBrush, QColor, QIcon
 from PyQt5.QtWidgets import QListWidget, QHBoxLayout, QGraphicsScene, QGraphicsView, QListWidgetItem, \
     QMenu, QMenuBar, QAction, QMainWindow, QFileDialog
 
 from milk.cmm import Cmm
-from milk.conf import Lang, signals, UIDef, LangUI, settings, UserKey
+from milk.conf import Lang, signals, UIDef, LangUI, settings, UserKey, ResMap
 from .ui_base import UIBase
 
 
@@ -231,9 +231,11 @@ class TextureUnpacker(UIBase, QMainWindow):
         menu = menu_bar.addMenu(LangUI.texture_unpacker_ui_btn_file)
         save_all = QAction(LangUI.texture_unpacker_action_save_all, self)
         save_all.setShortcut("Ctrl+S")
+        save_all.setIcon(QIcon(ResMap.img_save_one))
         save_all.triggered.connect(self.on_save_all)
         save_one = QAction(LangUI.texture_unpacker_action_save_one, self)
         save_one.setShortcut("Ctrl+Shift+S")
+        save_one.setIcon(QIcon(ResMap.img_save_one))
         save_one.triggered.connect(self.on_save_one)
         menu.addAction(save_all)
         menu.addAction(save_one)
@@ -336,7 +338,7 @@ class TextureUnpacker(UIBase, QMainWindow):
         save_at = join(choose_dir, name)
 
         if exists(save_at):
-            os.remove(save_at)
+            remove(save_at)
 
         dst_image = Image.new(mode, (sw, sh), (0, 0, 0, 0))
         crop_frame = src_image.crop((ltx, lty, rbx, rby))
@@ -350,7 +352,8 @@ class TextureUnpacker(UIBase, QMainWindow):
     def on_image_dropped(self, plist_path):
         def on_error(error):
             self.ui_graphics_scene.reset(True)
-            signals.logger_error.emit(LangUI.texture_unpacker_parse_fail.format(Lang.get("item_image_texture_unpacker"), plist_path))
+            signals.logger_error.emit(
+                LangUI.texture_unpacker_parse_fail.format(Lang.get("item_image_texture_unpacker"), plist_path))
             signals.logger_error.emit(error)
             signals.window_switch_to_main.emit()
 
