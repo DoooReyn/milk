@@ -1,125 +1,121 @@
-import json
+import os
 import plistlib
-import random
+import re
 from os.path import basename, dirname, join, exists, abspath
 from typing import Union
+
 from PIL import Image
-
-from PyQt5.QtCore import pyqtSignal, QRectF, QRect, Qt
-from PyQt5.QtGui import QPixmap, QColor, QPen, QBrush, QKeyEvent
+from PyQt5.QtCore import pyqtSignal, QRectF, Qt
+from PyQt5.QtGui import QPixmap, QPen, QBrush, QColor
 from PyQt5.QtWidgets import QListWidget, QHBoxLayout, QGraphicsScene, QGraphicsView, QListWidgetItem, \
-    QGraphicsRectItem, QMenu, QMenuBar, QAction, QVBoxLayout, QWidget, QMainWindow, QFileDialog
+    QMenu, QMenuBar, QAction, QMainWindow, QFileDialog
 
-from milk.cmm import TraceBack, Cmm
+from milk.cmm import Cmm
 from milk.conf import Lang, signals, UIDef
 from .ui_base import UIBase
 
 
-def _mapping_list(_result, _name, _data):
-    for i, v in enumerate(_name):
-        if isinstance(v, list):
-            _mapping_list(_result, v, _data[i])
+class PlistParser:
+    class FileNotFoundException(Exception):
+        pass
+
+    class InvalidFileException(Exception):
+        pass
+
+    class InvalidFormatException(Exception):
+        pass
+
+    @staticmethod
+    def parse(plist_path):
+        if not exists(plist_path):
+            raise PlistParser.FileNotFoundException()
+
+        try:
+            with open(plist_path, 'rb') as f:
+                plist_dict = plistlib.load(f)
+        except plistlib.InvalidFileException:
+            raise PlistParser.InvalidFileException()
+
+        if isinstance(plist_dict, dict) and plist_dict.get("frames") and plist_dict.get(
+                "metadata"):
+            metadata = plist_dict.get("metadata")
+            plist_format = metadata.get("format")
+            texture_name = metadata.get("textureFileName")
+            plist_frames = plist_dict.get("frames")
+
+            if plist_format not in (0, 1, 2, 3):
+                raise PlistParser.InvalidFormatException()
+
+            result = {
+                "frames": [],
+                "texture": texture_name
+            }
+
+            if plist_format == 0:
+                PlistParser.__parse_format_0(result, plist_frames)
+            elif plist_format == 1 or plist_format == 2:
+                PlistParser.__parse_format_1x2(result, plist_frames)
+            elif plist_format == 3:
+                PlistParser.__parse_format_3(result, plist_frames)
+
+            return result
         else:
-            _result[v] = _data[i]
+            raise PlistParser.InvalidFileException()
 
-    return _result
+    @staticmethod
+    def __parse_format_0(result: dict, plist_frames: dict):
+        for (name, config) in plist_frames.items():
+            ow = int(config.get("originalWidth", 0))
+            oh = int(config.get("originalHeight", 0))
+            sx = int(config.get("x", 0))
+            sy = int(config.get("y", 0))
+            ox = int(config.get("offsetX", 0))
+            oy = int(config.get("offsetY", 0))
+            result["frames"].append({
+                "name": name,
+                "rotated": False,
+                "source_size": (ow, oh),
+                "offset": (ox, oy),
+                "frame_rect": (sx, sy, ow, oh),
+                "crop_rect": (sx, sy, sx + ow, sy + oh)
+            })
 
-
-def _parse_str(_name, _str):
-    return _mapping_list({}, _name, json.loads(_str.replace("{", "[").replace("}", "]")))
-
-
-def parse_plist(data):
-    fmt = data.get("metadata").get("format")
-    # check file format
-    if fmt not in (0, 1, 2, 3):
-        print("fail: unsupported format " + str(fmt))
-        return None
-
-    ret = {}
-    frame_data_list = []
-
-    for (name, config) in data.get("frames").items():
-        frame_data = {}
-        if fmt == 0:
-            source_size = {
-                "w": config.get("originalWidth", 0),
-                "h": config.get("originalHeight", 0),
-            }
-            rotated = False
-            src_rect = (
-                config.get("x", 0),
-                config.get("y", 0),
-                config.get("x", 0) + config.get("originalWidth", 0),
-                config.get("y", 0) + config.get("originalHeight", 0),
-            )
-            dst_rect = (
-                config.get("x", 0),
-                config.get("y", 0),
-                config.get("width", 0),
-                config.get("height", 0),
-            )
-            offset = {
-                "x": config.get("offsetX", False),
-                "y": config.get("offsetY", False),
-            }
-        elif fmt == 1 or fmt == 2:
-            frame = _parse_str([["x", "y"], ["w", "h"]], config.frame)
-            center_offset = _parse_str(["x", "y"], config.offset)
-            source_size = _parse_str(["w", "h"], config.sourceSize)
+    @staticmethod
+    def __parse_format_1x2(result: dict, plist_frames: dict):
+        for (name, config) in plist_frames.items():
+            fx, fy, fw, fh = PlistParser.__extract_frame_field(config.get("frame"))
+            cx, cy = PlistParser.__extract_frame_field(config.get("offset"))
+            sw, sh = PlistParser.__extract_frame_field(config.get("sourceSize"))
             rotated = config.get("rotated", False)
-            src_rect = (
-                frame["x"],
-                frame["y"],
-                frame["x"] + (frame["h"] if rotated else frame["w"]),
-                frame["y"] + (frame["w"] if rotated else frame["h"])
-            )
-            offset = {
-                "x": source_size["w"] / 2 + center_offset["x"] - frame["w"] / 2,
-                "y": source_size["h"] / 2 - center_offset["y"] - frame["h"] / 2,
-            }
-            dst_rect = (
-                frame["x"],
-                frame["y"],
-                frame["x"] + frame["w"],
-                frame["y"] + frame["h"]
-            )
-        elif fmt == 3:
-            frame = _parse_str([["x", "y"], ["w", "h"]], config.textureRect)
-            center_offset = _parse_str(["x", "y"], config.spriteOffset)
-            source_size = _parse_str(["w", "h"], config.spriteSourceSize)
+            frame = PlistParser.__get_format1x2x3(name, rotated, fx, fy, fw, fh, cx, cy, sw, sh)
+            result["frames"].append(frame)
+
+    @staticmethod
+    def __parse_format_3(result: dict, plist_frames: dict):
+        for (name, config) in plist_frames.items():
+            fx, fy, fw, fh = PlistParser.__extract_frame_field(config.get("textureRect"))
+            cx, cy = PlistParser.__extract_frame_field(config.get("spriteOffset"))
+            sw, sh = PlistParser.__extract_frame_field(config.get("spriteSourceSize"))
             rotated = config.get("textureRotated", False)
-            src_rect = (
-                frame["x"],
-                frame["y"],
-                frame["x"] + (frame["h"] if rotated else frame["w"]),
-                frame["y"] + (frame["w"] if rotated else frame["h"])
-            )
-            dst_rect = (
-                frame["x"],
-                frame["y"],
-                frame["x"] + frame["w"],
-                frame["y"] + frame["h"]
-            )
-            offset = {
-                "x": source_size["w"] / 2 + center_offset["x"] - frame["w"] / 2,
-                "y": source_size["h"] / 2 - center_offset["y"] - frame["h"] / 2,
-            }
-        else:
-            continue
+            frame = PlistParser.__get_format1x2x3(name, rotated, fx, fy, fw, fh, cx, cy, sw, sh)
+            result["frames"].append(frame)
 
-        frame_data["name"] = name
-        frame_data["source_size"] = (int(source_size["w"]), int(source_size["h"]))
-        frame_data["rotated"] = rotated
-        frame_data["src_rect"] = [int(x) for x in src_rect]
-        frame_data["dst_rect"] = [int(x) for x in dst_rect]
-        frame_data["offset"] = (int(offset["x"]), int(offset["y"]))
+    @staticmethod
+    def __get_format1x2x3(name, rotated, fx, fy, fw, fh, cx, cy, sw, sh):
+        ow, oh = (fh, fw) if rotated else (fw, fh)
 
-        frame_data_list.append(frame_data)
+        return {
+            "name": name,
+            "rotated": rotated,
+            "source_size": (sw, sh),
+            "offset": (int(sw / 2 + cx - fw / 2), int(sh / 2 - cy - fh / 2)),
+            "frame_rect": (fx, fy, ow, oh),
+            "crop_rect": (fx, fy, fx + ow, fy + oh)
+        }
 
-    ret["frames"] = frame_data_list
-    ret["texture"] = data.get("metadata").get("textureFileName")
-    return ret
+    @staticmethod
+    def __extract_frame_field(text):
+        return (int(x) for x in re.sub(r"[{}]", "", text).split(','))
 
 
 class ResizableGraphicsView(QGraphicsView):
@@ -131,17 +127,27 @@ class ResizableGraphicsView(QGraphicsView):
 
 
 class DroppableGraphicsScene(QGraphicsScene):
-    image_dropped = pyqtSignal(str, str)
+    image_dropped = pyqtSignal(str)
 
     def __init__(self, view: ResizableGraphicsView = None):
         super(DroppableGraphicsScene, self).__init__()
-        self.addText("请在此处拖入 .png/.plist 文件")
-        # view.setAlignment(Qt.AlignCenter)
         view.setScene(self)
         view.resize_event.connect(self.__resize)
+        self.setBackgroundBrush(QBrush(QColor("#8e9eab")))
+
         self.image_view = view
         self.image_path = None
         self.plist_path = None
+        self.__selected_rect = None
+        self.reset(True)
+
+    def click_rect(self, rect: QRectF):
+        if self.__selected_rect:
+            self.removeItem(self.__selected_rect)
+            self.__selected_rect = None
+        pen = QPen(QColor("#00000000"))
+        brush = QBrush(QColor(193, 44, 31, 80))
+        self.__selected_rect = self.addRect(rect, pen=pen, brush=brush)
 
     def __resize(self):
         self.setSceneRect(0, 0, self.image_view.width(), self.image_view.height())
@@ -182,26 +188,22 @@ class DroppableGraphicsScene(QGraphicsScene):
 
     def dropEvent(self, event):
         self.__apply_image()
-        self.image_dropped.emit(self.image_path, self.plist_path)
+        self.image_dropped.emit(self.plist_path)
         event.acceptProposedAction()
 
     def __apply_image(self):
         if self.image_path and self.plist_path and exists(self.plist_path) and exists(self.image_path):
-            pixmap = QPixmap(self.image_path)
-            # width = pixmap.width()
-            # height = pixmap.height()
-            # w_width = self.image_view.width()
-            # w_height = self.image_view.height()
-            # if width // w_width > height // w_height:
-            #     pixmap = pixmap.scaledToWidth(w_width, Qt.SmoothTransformation)
-            # else:
-            #     pixmap = pixmap.scaledToHeight(w_height, Qt.SmoothTransformation)
-            self.clear()
-            self.addPixmap(pixmap)
+            self.reset()
+            self.addPixmap(QPixmap(self.image_path))
         else:
+            self.reset(True)
+
+    def reset(self, force: bool = False):
+        self.clear()
+        self.__selected_rect = None
+        if force:
             self.plist_path = None
             self.image_path = None
-            self.clear()
             self.addText("请在此处拖入 .png/.plist 文件")
 
 
@@ -210,7 +212,6 @@ class TextureUnpacker(UIBase, QMainWindow):
         self.ui_graphics_scene: Union[DroppableGraphicsScene, None] = None
         self.ui_graphics_view: Union[ResizableGraphicsView, None] = None
         self.ui_list_img: Union[QListWidget, None] = None
-        self.selected_rect: Union[QGraphicsRectItem, None] = None
         self.plist_data: Union[dict, None] = None
 
         super(QMainWindow, self).__init__()
@@ -268,28 +269,7 @@ class TextureUnpacker(UIBase, QMainWindow):
         if len(dir_choose) <= 0:
             return
 
-        print(dir_choose, self.ui_graphics_scene.image_path)
-
-        src_image = None
-        try:
-            src_image = Image.open(self.ui_graphics_scene.image_path)
-            frames = self.plist_data.get("frames")
-            for frame in frames:
-                filename = frame.get("name")
-                save_at = join(dir_choose, filename)
-                ltx, lty, rbx, rby = frame.get("src_rect")
-                sw, sh = frame.get("source_size")
-                split_image = Image.new("RGBA", (sw, sh), (0, 0, 0, 0))
-                crop_frame = src_image.crop((ltx, lty, rbx, rby))
-                split_image.paste(crop_frame, (0, 0, sw, sh))
-                split_image.save(save_at)
-                split_image.close()
-        except:
-            TraceBack().trace_back()
-        finally:
-            if src_image is not None:
-                src_image.close()
-                Cmm.open_external_file(dir_choose)
+        self.extract(dir_choose)
 
     def on_save_one(self):
         cur_row = self.ui_list_img.currentRow()
@@ -303,92 +283,94 @@ class TextureUnpacker(UIBase, QMainWindow):
         if len(dir_choose) > 0:
             self.extract_picture(dir_choose, cur_name)
 
+    @staticmethod
+    def get_image_mode(src_image):
+        return "RGBA" if (src_image.mode in ('RGBA', 'LA') or (
+                src_image.mode == 'P' and 'transparency' in src_image.info)) else "RGB"
+
     # noinspection PyBroadException
-    def extract_picture(self, save_at, filename):
+    def extract_picture(self, dir_choose, filename):
         if not self.plist_data:
             return
-        frames = self.plist_data.get("frames")
-
-        src_image = None
-        split_image = None
-
-        try:
-            for frame in frames:
-                if frame.get("name") == filename:
-                    ltx, lty, rbx, rby = frame.get("src_rect")
-                    sw, sh = frame.get("source_size")
-                    src_image: Image = Image.open(self.ui_graphics_scene.image_path)
-                    split_image = Image.new("RGBA", (sw, sh), (0, 0, 0, 0))
-                    crop_frame = src_image.crop((ltx, lty, rbx, rby))
-                    split_image.paste(crop_frame, (0, 0, sw, sh))
-                    split_image.save(join(save_at, filename))
-                    split_image.close()
-                    src_image.close()
-                    Cmm.open_external_file(save_at)
-                    break
-        except:
-            TraceBack().trace_back()
-        finally:
-            if split_image is not None:
-                split_image.close()
-            if src_image is not None:
-                src_image.close()
-
-    def on_image_dropped(self, image_path, plist_path):
-        print("on_image_dropped: ", image_path, plist_path)
-        self.parse_image(plist_path)
+        self.extract(dir_choose, filename)
 
     # noinspection PyBroadException
-    def parse_image(self, path):
-        def on_fail():
-            signals.logger_error("[{0}] 读取 '{0}' 失败！".format(Lang.get("item_image_texture_unpacker"), path))
-            signals.window_switch_to_main.emit()
-
+    def extract(self, dir_choose, filename=None):
+        src_image = None
         try:
-            with open(path, 'rb') as fp:
-                data = plistlib.load(fp)
-
-                if data is None:
-                    on_fail()
-                    return
-
-                data = parse_plist(data)
-                if not data or not data.get("frames") or not data.get("texture"):
-                    on_fail()
-
-                self.refresh_list_widget(data)
-        except:
-            TraceBack().trace_back()
-            on_fail()
+            src_image = Image.open(self.ui_graphics_scene.image_path)
+            mode = self.get_image_mode(src_image)
+            frames = self.plist_data.get("frames")
+            if filename is not None:
+                for frame in frames:
+                    name = frame.get("name")
+                    if name == filename:
+                        self.extract_frame(dir_choose, mode, src_image, frame, name)
+                        break
+            else:
+                for frame in frames:
+                    name = frame.get("name")
+                    self.extract_frame(dir_choose, mode, src_image, frame, name)
+        except Exception as e:
+            print(e)
+        finally:
+            if src_image is not None:
+                src_image.close()
+            Cmm.open_external_file(dir_choose)
 
     @staticmethod
-    def random_color():
-        return QColor(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255), 80)
+    def extract_frame(dir_choose, mode, src_image, frame, name):
+        ox, oy = frame.get("offset")
+        rotated = frame.get("rotated")
+        sw, sh = frame.get("source_size")
+        ltx, lty, rbx, rby = frame.get("crop_rect")
+        save_at = join(dir_choose, name)
 
-    def refresh_list_widget(self, data):
-        self.plist_data = data
-        frames = data.get("frames")
-        names = []
-        for frame in frames:
-            names.append(frame.get("name"))
+        if exists(save_at):
+            os.remove(save_at)
+
+        dst_image = Image.new(mode, (sw, sh), (0, 0, 0, 0))
+        crop_frame = src_image.crop((ltx, lty, rbx, rby))
+        if rotated:
+            crop_frame = crop_frame.rotate(90, expand=1)
+        dst_image.paste(crop_frame, (ox, oy), mask=0)
+        dst_image.save(save_at)
+        dst_image.close()
+
+    # noinspection PyBroadException
+    def on_image_dropped(self, plist_path):
+        def on_error():
+            self.ui_graphics_scene.reset(True)
+            signals.logger_error.emit("[{0}] 解析 '{1}' 失败！".format(Lang.get("item_image_texture_unpacker"), plist_path))
+            signals.window_switch_to_main.emit()
+
+        def on_start():
+            self.plist_data = PlistParser.parse(plist_path)
+            self.refresh_list_widget()
+
+        Cmm.trace(on_start, on_error)
+
+    def refresh_list_widget(self):
         self.ui_list_img.clear()
-        self.ui_list_img.addItems(names)
+        if self.plist_data is not None:
+            frames = self.plist_data.get("frames")
+            names = (frame.get("name") for frame in frames)
+            self.ui_list_img.addItems(names)
 
     def on_select_part(self, item: QListWidgetItem):
-        name = item.text()
-        if self.selected_rect is not None:
-            self.ui_graphics_scene.removeItem(self.selected_rect)
-            self.selected_rect = None
-        if self.plist_data:
-            frames = self.plist_data.get("frames")
-            for frame in frames:
-                if frame.get("name") == name:
-                    x, y, w, h = frame.get("dst_rect")
-                    rect = QRectF(x, y, w, h)
-                    pen = QPen(self.random_color())
-                    brush = QBrush(self.random_color())
-                    self.selected_rect = self.ui_graphics_scene.addRect(rect, pen=pen, brush=brush)
-                    break
+        try:
+            name = item.text()
+            if self.plist_data:
+                frames = self.plist_data.get("frames")
+                for frame in frames:
+                    if frame.get("name") == name:
+                        print("locate " + name + " ...")
+                        x, y, w, h = frame.get("frame_rect")
+                        rect = QRectF(x, y, w, h)
+                        self.ui_graphics_scene.click_rect(rect)
+                        break
+        except Exception as e:
+            print(e)
 
     def closeEvent(self, event):
         event.accept()
