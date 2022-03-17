@@ -252,6 +252,9 @@ class UserKey:
         atlas_locate_dir = "atlas_locate_dir"
         atlas_out_dir = "atlas_out_dir"
 
+    class TextureUnpacker:
+        last_save_at = "last_save_at"
+
 
 local_dir = QStandardPaths.writableLocation(QStandardPaths.AppConfigLocation)
 app_dir = path.join(local_dir, Settings.Names.app)

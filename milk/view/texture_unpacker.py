@@ -11,7 +11,7 @@ from PyQt5.QtWidgets import QListWidget, QHBoxLayout, QGraphicsScene, QGraphicsV
     QMenu, QMenuBar, QAction, QMainWindow, QFileDialog
 
 from milk.cmm import Cmm
-from milk.conf import Lang, signals, UIDef
+from milk.conf import Lang, signals, UIDef, LangUI, settings, UserKey
 from .ui_base import UIBase
 
 
@@ -210,7 +210,7 @@ class DroppableGraphicsScene(QGraphicsScene):
         if force:
             self.plist_path = None
             self.image_path = None
-            self.addText("请在此处拖入 .png/.plist 文件")
+            self.addText(LangUI.texture_unpacker_ui_tip)
 
 
 class TextureUnpacker(UIBase, QMainWindow):
@@ -228,11 +228,11 @@ class TextureUnpacker(UIBase, QMainWindow):
         self.setLayout(layout)
 
         menu_bar = QMenuBar()
-        menu = menu_bar.addMenu("文件")
-        save_all = QAction("保存所有图片", self)
+        menu = menu_bar.addMenu(LangUI.texture_unpacker_ui_btn_file)
+        save_all = QAction(LangUI.texture_unpacker_action_save_all, self)
         save_all.setShortcut("Ctrl+S")
         save_all.triggered.connect(self.on_save_all)
-        save_one = QAction("保存选中图片", self)
+        save_one = QAction(LangUI.texture_unpacker_action_save_one, self)
         save_one.setShortcut("Ctrl+Shift+S")
         save_one.triggered.connect(self.on_save_one)
         menu.addAction(save_all)
@@ -259,7 +259,7 @@ class TextureUnpacker(UIBase, QMainWindow):
 
     def on_request_list_menu(self, position):
         pop_menu = QMenu()
-        save_act = QAction("保存", self)
+        save_act = QAction(LangUI.texture_unpacker_ui_btn_save, self)
         pop_menu.addAction(save_act)
         if self.ui_list_img.itemAt(position):
             pop_menu.addAction(save_act)
@@ -271,11 +271,13 @@ class TextureUnpacker(UIBase, QMainWindow):
         if not self.plist_data:
             return
 
-        dir_choose = QFileDialog.getExistingDirectory(self, "请选择图片保存位置", Cmm.user_picture_dir())
-        if len(dir_choose) <= 0:
+        last_dir = settings.value(UserKey.TextureUnpacker.last_save_at, Cmm.user_picture_dir(), str)
+        choose_dir = QFileDialog.getExistingDirectory(self, LangUI.texture_unpacker_ui_save_dir, last_dir)
+        if len(choose_dir) <= 0:
             return
 
-        self.extract(dir_choose)
+        settings.setValue(UserKey.TextureUnpacker.last_save_at, choose_dir)
+        self.extract(choose_dir)
 
     def on_save_one(self):
         cur_row = self.ui_list_img.currentRow()
@@ -284,10 +286,11 @@ class TextureUnpacker(UIBase, QMainWindow):
             return
 
         cur_name = cur_item.text()
-
-        dir_choose = QFileDialog.getExistingDirectory(self, "请选择图片保存位置", Cmm.user_picture_dir())
-        if len(dir_choose) > 0:
-            self.extract_picture(dir_choose, cur_name)
+        last_dir = settings.value(UserKey.TextureUnpacker.last_save_at, Cmm.user_picture_dir(), str)
+        choose_dir = QFileDialog.getExistingDirectory(self, LangUI.texture_unpacker_ui_save_dir, last_dir)
+        if len(choose_dir) > 0:
+            self.extract_picture(choose_dir, cur_name)
+            settings.setValue(UserKey.TextureUnpacker.last_save_at, choose_dir)
 
     @staticmethod
     def get_image_mode(src_image):
@@ -295,13 +298,13 @@ class TextureUnpacker(UIBase, QMainWindow):
                 src_image.mode == 'P' and 'transparency' in src_image.info)) else "RGB"
 
     # noinspection PyBroadException
-    def extract_picture(self, dir_choose, filename):
+    def extract_picture(self, choose_dir, filename):
         if not self.plist_data:
             return
-        self.extract(dir_choose, filename)
+        self.extract(choose_dir, filename)
 
     # noinspection PyBroadException
-    def extract(self, dir_choose, filename=None):
+    def extract(self, choose_dir, filename=None):
         src_image = None
         try:
             src_image = Image.open(self.ui_graphics_scene.image_path)
@@ -311,26 +314,26 @@ class TextureUnpacker(UIBase, QMainWindow):
                 for frame in frames:
                     name = frame.get("name")
                     if name == filename:
-                        self.extract_frame(dir_choose, mode, src_image, frame, name)
+                        self.extract_frame(choose_dir, mode, src_image, frame, name)
                         break
             else:
                 for frame in frames:
                     name = frame.get("name")
-                    self.extract_frame(dir_choose, mode, src_image, frame, name)
+                    self.extract_frame(choose_dir, mode, src_image, frame, name)
         except Exception as e:
             print(e)
         finally:
             if src_image is not None:
                 src_image.close()
-            Cmm.open_external_file(dir_choose)
+            Cmm.open_external_file(choose_dir)
 
     @staticmethod
-    def extract_frame(dir_choose, mode, src_image, frame, name):
+    def extract_frame(choose_dir, mode, src_image, frame, name):
         ox, oy = frame.get("offset")
         rotated = frame.get("rotated")
         sw, sh = frame.get("source_size")
         ltx, lty, rbx, rby = frame.get("crop_rect")
-        save_at = join(dir_choose, name)
+        save_at = join(choose_dir, name)
 
         if exists(save_at):
             os.remove(save_at)
@@ -347,7 +350,7 @@ class TextureUnpacker(UIBase, QMainWindow):
     def on_image_dropped(self, plist_path):
         def on_error(error):
             self.ui_graphics_scene.reset(True)
-            signals.logger_error.emit("[{0}] 解析 '{1}' 失败！".format(Lang.get("item_image_texture_unpacker"), plist_path))
+            signals.logger_error.emit(LangUI.texture_unpacker_parse_fail.format(Lang.get("item_image_texture_unpacker"), plist_path))
             signals.logger_error.emit(error)
             signals.window_switch_to_main.emit()
 

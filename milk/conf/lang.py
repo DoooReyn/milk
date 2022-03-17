@@ -89,3 +89,13 @@ class LangUI:
     atlas_extractor_ui_edit_out_dir = "请选择碎图输出目录"
     atlas_extractor_ui_btn_choose = "选择"
     atlas_extractor_ui_btn_parse = "解析"
+
+    texture_unpacker_ui_tip = "请在此处拖入 .png/.plist 文件"
+    texture_unpacker_ui_save_dir = "请选择图片保存位置"
+    texture_unpacker_parse_fail = "[{0}] 解析 '{1}' 失败！"
+    texture_unpacker_ui_btn_save = "保存"
+    texture_unpacker_ui_btn_file = "文件"
+    texture_unpacker_action_save_all = "保存所有图片"
+    texture_unpacker_action_save_one = "保存选中图片"
+
+
