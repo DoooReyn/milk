@@ -1,10 +1,12 @@
 import ctypes
+import sys
 from os import listdir, makedirs
-from os.path import join, splitext, isdir, abspath
+from os.path import join, splitext, isdir, abspath, realpath, dirname
 from pathlib import Path
 from shutil import rmtree
 from threading import Thread, Event
 from traceback import format_exc, print_exc
+from PIL import Image
 
 import win32api
 import win32con
@@ -57,6 +59,14 @@ class TraceBack:
 
 
 class Cmm:
+    @staticmethod
+    def is_debug_mode():
+        return sys.executable.endswith("python.exe")
+
+    @staticmethod
+    def app_running_dir():
+        return realpath(join(dirname(__file__), '..')) if Cmm.is_debug_mode else realpath(dirname(sys.executable))
+
     @staticmethod
     def local_cache_dir():
         return QStandardPaths.writableLocation(QStandardPaths.AppConfigLocation)
