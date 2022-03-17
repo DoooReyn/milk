@@ -12,10 +12,10 @@ class LogLevel(Enum):
 
 
 LogColor = {
-    "trace": '<span style="color:#e8eaf6; font-size:14px;">{0}</span>',
-    "debug": '<span style="color:#2196f3; font-size:14px;">{0}</span>',
+    "trace": '<span style="color:#f5f6fa; font-size:14px;">{0}</span>',
+    "debug": '<span style="color:#00a8ff; font-size:14px;">{0}</span>',
     "info": '<span style="color:#1eff1e; font-size:14px;">{0}</span>',
     "warn": '<span style="color:#ffee6f; font-size:14px;">{0}</span>',
-    "error": '<span style="color:#c8161d; font-size:14px;">{0}</span>',
+    "error": '<span style="color:#e55039; font-size:14px;">{0}</span>',
     "fatal": '<span style="background-color:#c8161d; color:#e8eaf6; font-size:14px;">{0}</span>',
 }

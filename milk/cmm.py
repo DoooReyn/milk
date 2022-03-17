@@ -38,10 +38,10 @@ class Cmm:
     def trace(on_start, on_error=None, on_final=None):
         try:
             return on_start()
-        except Exception as e:
+        except Exception:
             print_exc()
             if on_error:
-                return on_error()
+                return on_error(format_exc())
         finally:
             if on_final:
                 return on_final()

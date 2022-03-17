@@ -16,51 +16,57 @@ from .ui_base import UIBase
 
 
 class PlistParser:
-    class FileNotFoundException(Exception):
+    class FileNotFoundException(ValueError):
         pass
 
-    class InvalidFileException(Exception):
+    class InvalidFileException(ValueError):
         pass
 
-    class InvalidFormatException(Exception):
+    class InvalidFormatException(ValueError):
+        pass
+
+    class FloatNotSupportException(ValueError):
         pass
 
     @staticmethod
     def parse(plist_path):
         if not exists(plist_path):
-            raise PlistParser.FileNotFoundException()
+            raise PlistParser.FileNotFoundException("No such file: {0}".format(plist_path))
 
         try:
             with open(plist_path, 'rb') as f:
                 plist_dict = plistlib.load(f)
         except plistlib.InvalidFileException:
-            raise PlistParser.InvalidFileException()
+            raise PlistParser.InvalidFileException("Invalid plist file: {0}".format(plist_path))
 
-        if isinstance(plist_dict, dict) and plist_dict.get("frames") and plist_dict.get(
-                "metadata"):
-            metadata = plist_dict.get("metadata")
-            plist_format = metadata.get("format")
-            texture_name = metadata.get("textureFileName")
-            plist_frames = plist_dict.get("frames")
+        try:
+            if isinstance(plist_dict, dict) and plist_dict.get("frames") and plist_dict.get(
+                    "metadata"):
+                metadata = plist_dict.get("metadata")
+                plist_format = metadata.get("format")
+                texture_name = metadata.get("textureFileName")
+                plist_frames = plist_dict.get("frames")
 
-            if plist_format not in (0, 1, 2, 3):
-                raise PlistParser.InvalidFormatException()
+                if plist_format not in (0, 1, 2, 3):
+                    raise PlistParser.InvalidFormatException("Invalid plist format: {0}".format(plist_format))
 
-            result = {
-                "frames": [],
-                "texture": texture_name
-            }
+                result = {
+                    "frames": [],
+                    "texture": texture_name
+                }
 
-            if plist_format == 0:
-                PlistParser.__parse_format_0(result, plist_frames)
-            elif plist_format == 1 or plist_format == 2:
-                PlistParser.__parse_format_1x2(result, plist_frames)
-            elif plist_format == 3:
-                PlistParser.__parse_format_3(result, plist_frames)
+                if plist_format == 0:
+                    PlistParser.__parse_format_0(result, plist_frames)
+                elif plist_format == 1 or plist_format == 2:
+                    PlistParser.__parse_format_1x2(result, plist_frames)
+                elif plist_format == 3:
+                    PlistParser.__parse_format_3(result, plist_frames)
 
-            return result
-        else:
-            raise PlistParser.InvalidFileException()
+                return result
+            else:
+                raise PlistParser.InvalidFileException("Invalid plist file: {0}".format(plist_path))
+        except ValueError:
+            raise PlistParser.FloatNotSupportException("Not support float value in frame")
 
     @staticmethod
     def __parse_format_0(result: dict, plist_frames: dict):
@@ -108,7 +114,7 @@ class PlistParser:
             "name": name,
             "rotated": rotated,
             "source_size": (sw, sh),
-            "offset": (int(sw / 2 + cx - fw / 2), int(sh / 2 - cy - fh / 2)),
+            "offset": ((sw / 2 + cx - fw / 2), (sh / 2 - cy - fh / 2)),
             "frame_rect": (fx, fy, ow, oh),
             "crop_rect": (fx, fy, fx + ow, fy + oh)
         }
@@ -339,9 +345,10 @@ class TextureUnpacker(UIBase, QMainWindow):
 
     # noinspection PyBroadException
     def on_image_dropped(self, plist_path):
-        def on_error():
+        def on_error(error):
             self.ui_graphics_scene.reset(True)
             signals.logger_error.emit("[{0}] 解析 '{1}' 失败！".format(Lang.get("item_image_texture_unpacker"), plist_path))
+            signals.logger_error.emit(error)
             signals.window_switch_to_main.emit()
 
         def on_start():
