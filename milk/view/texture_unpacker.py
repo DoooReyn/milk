@@ -1,4 +1,5 @@
 import plistlib
+import pprint
 import re
 from os import remove
 from os.path import basename, dirname, join, exists, abspath
@@ -71,20 +72,23 @@ class PlistParser:
     @staticmethod
     def __parse_format_0(result: dict, plist_frames: dict):
         for (name, config) in plist_frames.items():
-            ow = int(config.get("originalWidth", 0))
-            oh = int(config.get("originalHeight", 0))
-            sx = int(config.get("x", 0))
-            sy = int(config.get("y", 0))
-            ox = int(config.get("offsetX", 0))
-            oy = int(config.get("offsetY", 0))
-            result["frames"].append({
-                "name": name,
-                "rotated": False,
-                "source_size": (ow, oh),
-                "offset": (ox, oy),
-                "frame_rect": (sx, sy, ow, oh),
-                "crop_rect": (sx, sy, sx + ow, sy + oh)
-            })
+            try:
+                ow = int(config.get("originalWidth", 0))
+                oh = int(config.get("originalHeight", 0))
+                sx = int(config.get("x", 0))
+                sy = int(config.get("y", 0))
+                ox = int(config.get("offsetX", 0))
+                oy = int(config.get("offsetY", 0))
+                result["frames"].append({
+                    "name": name,
+                    "rotated": False,
+                    "source_size": (ow, oh),
+                    "offset": (ox, oy),
+                    "frame_rect": (sx, sy, ow, oh),
+                    "crop_rect": (sx, sy, sx + ow, sy + oh)
+                })
+            except Exception as e:
+                print("parse format 0: ", e)
 
     @staticmethod
     def __parse_format_1x2(result: dict, plist_frames: dict):
@@ -105,6 +109,8 @@ class PlistParser:
             rotated = config.get("textureRotated", False)
             frame = PlistParser.__get_format1x2x3(name, rotated, fx, fy, fw, fh, cx, cy, sw, sh)
             result["frames"].append(frame)
+        pprint.pprint("__parse_format_3: ")
+        pprint.pprint(result)
 
     @staticmethod
     def __get_format1x2x3(name, rotated, fx, fy, fw, fh, cx, cy, sw, sh):
@@ -114,14 +120,17 @@ class PlistParser:
             "name": name,
             "rotated": rotated,
             "source_size": (sw, sh),
-            "offset": ((sw / 2 + cx - fw / 2), (sh / 2 - cy - fh / 2)),
+            "offset": (int(sw / 2 + cx - fw / 2), int(sh / 2 - cy - fh / 2)),
             "frame_rect": (fx, fy, ow, oh),
             "crop_rect": (fx, fy, fx + ow, fy + oh)
         }
 
     @staticmethod
     def __extract_frame_field(text):
-        return (int(x) for x in re.sub(r"[{}]", "", text).split(','))
+        try:
+            return (int(x) for x in re.sub(r"[{}]", "", text).split(','))
+        except Exception as e:
+            print("Fuck!", e)
 
 
 class ResizableGraphicsView(QGraphicsView):
@@ -316,14 +325,16 @@ class TextureUnpacker(UIBase, QMainWindow):
                 for frame in frames:
                     name = frame.get("name")
                     if name == filename:
+                        print("extract 1: ", mode, name, frame)
                         self.extract_frame(choose_dir, mode, src_image, frame, name)
                         break
             else:
                 for frame in frames:
                     name = frame.get("name")
+                    print("extract 2: ", mode, name, frame)
                     self.extract_frame(choose_dir, mode, src_image, frame, name)
         except Exception as e:
-            print(e)
+            print("extract failed: ", e)
         finally:
             if src_image is not None:
                 src_image.close()
@@ -347,6 +358,8 @@ class TextureUnpacker(UIBase, QMainWindow):
         dst_image.paste(crop_frame, (ox, oy), mask=0)
         dst_image.save(save_at)
         dst_image.close()
+
+        print(frame)
 
     # noinspection PyBroadException
     def on_image_dropped(self, plist_path):
