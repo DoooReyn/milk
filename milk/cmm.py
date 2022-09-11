@@ -91,6 +91,13 @@ class Cmm:
         Cmm.trace(on_start)
 
     @staticmethod
+    def open_external_url(url: str):
+        QDesktopServices.openUrl(QUrl(url))
+        # def on_start():
+        #     QDesktopServices.openUrl(QUrl(url))
+        # Cmm.trace(on_start)
+
+    @staticmethod
     def get_ext_name(path):
         return splitext(path)[-1]
 

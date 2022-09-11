@@ -224,8 +224,33 @@ class Settings:
                     "icon": ResMap.img_api
                 },
                 {
+                    "name": "item_doc_html",
+                    "trigger": "on_menu_doc_html",
+                    "icon": ResMap.img_api
+                },
+                {
+                    "name": "item_doc_css",
+                    "trigger": "on_menu_doc_css",
+                    "icon": ResMap.img_api
+                },
+                {
+                    "name": "item_doc_canvas",
+                    "trigger": "on_menu_doc_canvas",
+                    "icon": ResMap.img_api
+                },
+                {
+                    "name": "item_doc_javascript",
+                    "trigger": "on_menu_doc_javascript",
+                    "icon": ResMap.img_api
+                },
+                {
                     "name": "item_doc_typescript",
                     "trigger": "on_menu_doc_typescript",
+                    "icon": ResMap.img_api
+                },
+                {
+                    "name": "item_doc_go",
+                    "trigger": "on_menu_doc_go",
                     "icon": ResMap.img_api
                 },
             )

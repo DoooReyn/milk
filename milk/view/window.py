@@ -134,6 +134,54 @@ class Window(QMainWindow):
     def on_menu_tools_random_wallpaper(self):
         self.open_menu(UIDef.ToolsWallpaper, UnsplashWallPaper)
 
+    @staticmethod
+    def open_api_document(url: str):
+        Cmm.open_external_url(url)
+
+    @staticmethod
+    def on_menu_doc_typescript():
+        Window.open_api_document("https://www.typescriptlang.org/docs/")
+
+    @staticmethod
+    def on_menu_doc_qt():
+        Window.open_api_document("https://doc.qt.io/qtforpython/")
+
+    @staticmethod
+    def on_menu_doc_cocos2dx():
+        Window.open_api_document("https://docs.cocos2d-x.org/api-ref/index.html")
+
+    @staticmethod
+    def on_menu_doc_cocos_creator():
+        Window.open_api_document("https://docs.cocos.com/creator/manual/zh/")
+
+    @staticmethod
+    def on_menu_doc_lua():
+        Window.open_api_document("https://www.lua.org/docs.html")
+
+    @staticmethod
+    def on_menu_doc_python():
+        Window.open_api_document("https://docs.python.org/zh-cn/3.10/reference/index.html")
+
+    @staticmethod
+    def on_menu_doc_html():
+        Window.open_api_document("https://developer.mozilla.org/zh-CN/docs/Web/HTML")
+
+    @staticmethod
+    def on_menu_doc_css():
+        Window.open_api_document("https://developer.mozilla.org/zh-CN/docs/Web/CSS")
+
+    @staticmethod
+    def on_menu_doc_javascript():
+        Window.open_api_document("https://developer.mozilla.org/zh-CN/docs/Learn/JavaScript")
+
+    @staticmethod
+    def on_menu_doc_canvas():
+        Window.open_api_document("https://developer.mozilla.org/zh-CN/docs/Web/API/Canvas_API/Tutorial")
+
+    @staticmethod
+    def on_menu_doc_go():
+        Window.open_api_document("https://go.dev/doc/")
+
     def closeEvent(self, evt):
         for key, win in self.windows.items():
             if win is not None:

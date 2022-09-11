@@ -45,6 +45,11 @@ Lang = dict({
     "item_doc_python": "Python",
     "item_doc_typescript": "TypeScript",
     "item_doc_qt": "Qt",
+    "item_doc_html": "HTML",
+    "item_doc_css": "CSS",
+    "item_doc_canvas": "Canvas",
+    "item_doc_javascript": "JavaScript",
+    "item_doc_go": "Go",
 })
 
 
@@ -97,5 +102,3 @@ class LangUI:
     texture_unpacker_ui_btn_file = "文件"
     texture_unpacker_action_save_all = "保存所有图片"
     texture_unpacker_action_save_one = "保存选中图片"
-
-
