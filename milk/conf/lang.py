@@ -6,6 +6,7 @@ Lang = dict({
     "item_file_about_qt": "关于Qt",
     "item_file_about_me": "关于我",
     "item_file_help": "帮助",
+    "item_file_test_view": "测试",
 
     "menu_image": "图片",
     "item_image_split": "图片分割器",
@@ -30,6 +31,7 @@ Lang = dict({
     "item_tools_audio": "音频处理",
     "item_tools_variable_name": "变量取名神器",
     "item_tools_plist_minify": "plist文件压缩",
+    "item_tools_weread": "微读阅读器",
 
     "menu_lua": "Lua",
     "item_lua_grammar": "语法检测",
@@ -50,6 +52,16 @@ Lang = dict({
     "item_doc_canvas": "Canvas",
     "item_doc_javascript": "JavaScript",
     "item_doc_go": "Go",
+
+    "translate:menu_file": "文件",
+    "translate:menu_file:item_select_ctranslate2_model": "加载 Ctranslate2 模型",
+    "translate:menu_file:item_select_sentence_piece_model": "加载 SentencePiece 模型",
+    "translate:menu_file:item_download_model_mini": "下载精简模型",
+    "translate:menu_file:item_download_model_big": "下载完整模型",
+
+    "translate:menu_help": "帮助",
+    "translate:menu_help:item_manual": "手册",
+    "translate:menu_help:item_about": "关于",
 })
 
 
@@ -102,3 +114,17 @@ class LangUI:
     texture_unpacker_ui_btn_file = "文件"
     texture_unpacker_action_save_all = "保存所有图片"
     texture_unpacker_action_save_one = "保存选中图片"
+
+    translate_title = "离线翻译"
+    translate_lang_zh = '中文'
+    translate_lang_en = '英文'
+    translate_lang_ja = '日文'
+    translate_lang_kr = '韩文'
+    translate_input = '输入翻译内容'
+    translate_translate = '翻译'
+    translate_copy_result = '复制结果'
+    translate_display_result = '查看翻译结果'
+    translate_quality = ' 质量 '
+    translate_quality_1 = '标准'
+    translate_quality_2 = '良好'
+    translate_quality_3 = '优秀'

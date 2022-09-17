@@ -1,22 +1,22 @@
-from typing import Union
-
-from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QMainWindow, QApplication, QMenu, QAction, QMenuBar
+from PyQt5.QtWidgets import QApplication, QMainWindow
 
 from milk.cmm import Cmm
-from milk.conf import Settings, Lang, LangUI, signals, UIDef
+from milk.conf import LangUI, Settings, signals, UIDef
+from milk.gui import GUI
+from milk.view.about_me import AboutMe
+from milk.view.spine_atlas_extractor import SpineAtlasExtractor
+from milk.view.TestView import TestView
+from milk.view.translate.translate import TranslateView
+from milk.view.texture_unpacker import TextureUnpacker
+from milk.view.wallpaper import UnsplashWallPaper
+from milk.view.weread import WeRead
 from .main_ui import MainUI
-from view.wallpaper import UnsplashWallPaper
-from view.about_me import AboutMe
-from view.spine_atlas_extractor import SpineAtlasExtractor
-from view.texture_unpacker import TextureUnpacker
 
 
 class Window(QMainWindow):
     def __init__(self):
         super(Window, self).__init__()
         self.setup()
-        self.set_menu()
         self.set_ui()
         self.setup_signals()
 
@@ -31,13 +31,14 @@ class Window(QMainWindow):
     def on_switch_to_main(self):
         self.activateWindow()
 
-    def on_sub_window_closed(self, win_code):
+    def on_sub_window_closed(self, win_code: int):
         win_def = UIDef(win_code)
         win = self.windows[win_def.name]
         if win is not None:
             self.windows[win_def.name] = None
+            signals.logger_debug.emit('{0} 关闭.'.format(win_def.name))
         else:
-            signals.logger_fatal.emit("{0} not closed!".format(win_def.name))
+            signals.logger_fatal.emit("{0} 未正确关闭!".format(win_def.name))
 
     def setup(self):
         self.resize(Settings.Sizes.ori_width, Settings.Sizes.ori_height)
@@ -49,41 +50,9 @@ class Window(QMainWindow):
 
         self.move(x, y)
 
-    def set_menu(self):
-        menu_bar = QMenuBar()
-
-        for menu_class in Settings.Menus.all:
-            menu_name = Lang.get(menu_class.Name) or menu_class.Name
-            menu = QMenu(menu_name, self)
-            for action in menu_class.Actions:
-                name = action.get("name")
-                name = Lang.get(name) or name
-                hotkey = action.get("hotkey")
-                icon = action.get("icon")
-                trigger = action.get("trigger")
-                act = QAction(name, menu)
-                if trigger is not None:
-                    if getattr(self, trigger, None) is not None:
-                        act.triggered.connect(getattr(self, trigger))
-                    else:
-                        act.triggered.connect(lambda *args, m=menu_name, n=name: self.on_bind_not_implemented(m, n))
-                else:
-                    act.triggered.connect(lambda *args, m=menu_name, n=name: self.on_bind_not_implemented(m, n))
-                if hotkey is not None:
-                    act.setShortcut(hotkey)
-                if icon is not None:
-                    act.setIcon(QIcon(icon))
-                menu.addAction(act)
-            menu_bar.addMenu(menu)
-
-        self.setMenuBar(menu_bar)
-
     def set_ui(self):
         self.setCentralWidget(MainUI())
-
-    # noinspection PyMethodMayBeStatic
-    def on_bind_not_implemented(self, menu, name):
-        signals.logger_warn.emit(LangUI.msg_not_implemented.format(menu, name))
+        self.setMenuBar(GUI.create_menu_bar(Settings.Menus, self))
 
     @staticmethod
     def on_menu_open_cache():
@@ -100,6 +69,15 @@ class Window(QMainWindow):
 
     def on_menu_open_about_me(self):
         self.open_menu(UIDef.FileAboutMe, AboutMe)
+
+    def on_menu_tools_weread(self):
+        self.open_menu(UIDef.ToolsWeRead, WeRead)
+
+    def on_menu_test_view(self):
+        self.open_menu(UIDef.FileTest, TestView)
+
+    def on_menu_tools_translate(self):
+        self.open_menu(UIDef.ToolsTranslate, TranslateView)
 
     @staticmethod
     def on_menu_exit_app():

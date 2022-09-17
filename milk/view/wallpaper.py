@@ -1,15 +1,15 @@
 from os.path import exists, join
 from typing import Union
 
-from PyQt5.QtCore import QFileInfo, QFile, QIODevice, QUrl
+from PyQt5.QtCore import QFile, QFileInfo, QIODevice, QUrl
 from PyQt5.QtGui import QPixmap
-from PyQt5.QtNetwork import QNetworkRequest, QNetworkReply, QNetworkAccessManager
-from PyQt5.QtWidgets import QLineEdit, QPushButton, QWidget, QProgressBar, QFileDialog, QLabel, QMessageBox
+from PyQt5.QtNetwork import QNetworkAccessManager, QNetworkReply, QNetworkRequest
+from PyQt5.QtWidgets import QFileDialog, QLabel, QLineEdit, QMessageBox, QProgressBar, QPushButton, QWidget
 from unsplash.api import Api
 from unsplash.auth import Auth
 
 from milk.cmm import Cmm
-from milk.conf import settings, UserKey, signals, UIDef, LangUI, Lang
+from milk.conf import Lang, LangUI, settings, signals, UIDef, UserKey
 from milk.view.ui_base import UIBase
 
 
@@ -31,6 +31,7 @@ class UnsplashWallPaper(UIBase):
         self.out_file: Union[QFile, None] = None
         self.url: Union[QUrl, None] = None
         self.file_name: Union[str, None] = None
+        self.setup_window_code(UIDef.ToolsWallpaper.value)
 
         super().__init__(parent)
 
@@ -211,7 +212,3 @@ class UnsplashWallPaper(UIBase):
 
     def on_sync_save_at(self):
         settings.setValue(UserKey.Wallpaper.save_at, self.ui_save_at.text())
-
-    def closeEvent(self, event):
-        event.accept()
-        signals.window_closed.emit(UIDef.ToolsWallpaper.value)

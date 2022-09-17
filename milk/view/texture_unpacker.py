@@ -2,17 +2,17 @@ import plistlib
 import pprint
 import re
 from os import remove
-from os.path import basename, dirname, join, exists, abspath
+from os.path import abspath, basename, dirname, exists, join
 from typing import Union
 
 from PIL import Image
 from PyQt5.QtCore import pyqtSignal, QRectF, Qt
-from PyQt5.QtGui import QPixmap, QPen, QBrush, QColor, QIcon
-from PyQt5.QtWidgets import QListWidget, QHBoxLayout, QGraphicsScene, QGraphicsView, QListWidgetItem, \
-    QMenu, QMenuBar, QAction, QMainWindow, QFileDialog
+from PyQt5.QtGui import QBrush, QColor, QIcon, QPen, QPixmap
+from PyQt5.QtWidgets import QAction, QFileDialog, QGraphicsScene, QGraphicsView, QHBoxLayout, QListWidget, \
+    QListWidgetItem, QMainWindow, QMenu, QMenuBar
 
 from milk.cmm import Cmm
-from milk.conf import Lang, signals, UIDef, LangUI, settings, UserKey, ResMap
+from milk.conf import Lang, LangUI, ResMap, settings, signals, UIDef, UserKey
 from .ui_base import UIBase
 
 
@@ -229,6 +229,8 @@ class TextureUnpacker(UIBase, QMainWindow):
         self.ui_list_img: Union[QListWidget, None] = None
         self.plist_data: Union[dict, None] = None
 
+        self.setup_window_code(UIDef.ImageTextureUnpacker.value)
+
         super(QMainWindow, self).__init__()
         super(TextureUnpacker, self).__init__()
 
@@ -397,7 +399,3 @@ class TextureUnpacker(UIBase, QMainWindow):
                         break
         except Exception as e:
             print(e)
-
-    def closeEvent(self, event):
-        event.accept()
-        signals.window_closed.emit(UIDef.ImageTextureUnpacker.value)

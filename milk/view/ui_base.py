@@ -1,15 +1,28 @@
-from PyQt5.QtCore import Qt, QSize
+from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtGui import QFont
-from PyQt5.QtWidgets import QWidget, QLineEdit, QTextBrowser, QLabel, QVBoxLayout, QPushButton, QHBoxLayout, \
-    QGridLayout, QProgressBar
+from PyQt5.QtWidgets import QGridLayout, QHBoxLayout, QLabel, QLineEdit, QProgressBar, QPushButton, QTextBrowser, \
+    QVBoxLayout, QWidget
+
+from milk.conf import signals
+from milk.gui import GUI
 
 
 class UIBase(QWidget):
+    window_code: int = 0
 
     def __init__(self, parent: QWidget = None):
         super(UIBase, self).__init__(parent)
         self.setup_ui()
         self.setup_signals()
+
+    def closeEvent(self, event):
+        if self.window_code > 0:
+            signals.window_closed.emit(self.window_code)
+        event.accept()
+        super().closeEvent(event)
+
+    def setup_window_code(self, code: int):
+        self.window_code = code
 
     def setup_ui(self):
         pass
@@ -43,6 +56,10 @@ class UIBase(QWidget):
     def add_widget(self, parent: QWidget):
         child = QWidget()
         parent.layout().addWidget(child)
+        return child
+
+    def add_child(self, child: QWidget):
+        self.layout().addWidget(child)
         return child
 
     def add_grid_layout(self, parent: QWidget):
@@ -109,3 +126,8 @@ class UIBase(QWidget):
         child = QProgressBar()
         parent.layout().addWidget(child)
         return child
+
+    def add_menu_bar(self, menus):
+        menu_bar = GUI.create_menu_bar(menus, self)
+        self.layout().setMenuBar(menu_bar)
+        return menu_bar

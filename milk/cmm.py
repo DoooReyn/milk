@@ -1,23 +1,18 @@
 import ctypes
-import sys
 import random
+import sys
 from os import listdir, makedirs
-from os.path import join, splitext, isdir, abspath, realpath, dirname
-from pathlib import Path
+from os.path import abspath, dirname, isdir, join, realpath, splitext
 from shutil import rmtree
-from threading import Thread, Event
+from threading import Event, Thread
 from traceback import format_exc, print_exc
-from PIL import Image
-from datetime import datetime
 
 import win32api
 import win32con
-from PyQt5.QtCore import QUrl, QStandardPaths
-from PyQt5.QtGui import QDesktopServices, QColor
+from PyQt5.QtCore import QStandardPaths, QUrl
+from PyQt5.QtGui import QColor, QDesktopServices
 from PyQt5.QtWidgets import QMessageBox
 from win32gui import SystemParametersInfo
-
-from conf.settings import Settings
 
 
 class StoppableThread(Thread):
@@ -88,6 +83,7 @@ class Cmm:
         def on_start():
             filepath = QUrl("file:///" + realpath(url))
             QDesktopServices.openUrl(filepath)
+
         Cmm.trace(on_start)
 
     @staticmethod
@@ -146,6 +142,7 @@ class Cmm:
             win32api.RegSetValueEx(key, "TileWallpaper", 0, win32con.REG_SZ, "0")
             SystemParametersInfo(win32con.SPI_SETDESKWALLPAPER, abspath(path), win32con.SPIF_SENDWININICHANGE)
             win32api.RegCloseKey(key)
+
         Cmm.trace(on_start)
 
     @staticmethod
@@ -174,4 +171,5 @@ class MsgBox:
             msg.setStandardButtons(style)
             ret = msg.exec_()
             return ret
+
         return Cmm.trace(on_start)

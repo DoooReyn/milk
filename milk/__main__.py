@@ -1,4 +1,5 @@
 from view.app import App
+from cmm import Cmm
 
 if __name__ == '__main__':
-    App().run()
+    Cmm.trace(lambda: App().run())

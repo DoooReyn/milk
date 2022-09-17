@@ -1,16 +1,16 @@
 import re
 import time
-from os import walk, makedirs
-from os.path import isdir, splitext, join, dirname, exists
+from os import makedirs, walk
+from os.path import dirname, exists, isdir, join, splitext
 from shutil import rmtree
 from typing import Union
 
 from PIL import Image
-from PyQt5.QtWidgets import QWidget, QLineEdit, QPushButton, QFileDialog
+from PyQt5.QtWidgets import QFileDialog, QLineEdit, QPushButton, QWidget
 
-from milk.conf import Lang, LangUI, settings, UserKey, signals, UIDef
-from .ui_base import UIBase
 from milk.cmm import StoppableThread
+from milk.conf import Lang, LangUI, settings, signals, UIDef, UserKey
+from .ui_base import UIBase
 
 
 class SpineAtlasExtractor(UIBase):
@@ -20,6 +20,7 @@ class SpineAtlasExtractor(UIBase):
         self.ui_edit_atlas_out_dir: Union[QLineEdit, None] = None
         self.ui_btn_out_choose: Union[QPushButton, None] = None
         self.ui_btn_parse: Union[QPushButton, None] = None
+        self.setup_window_code(UIDef.ImageSpineAtlasExtractor.value)
 
         super().__init__(parent)
 
@@ -113,6 +114,7 @@ class SpineAtlasExtractor(UIBase):
                 self.reset_ui(True)
                 signals.logger_info.emit(LangUI.msg_all_extracted.format(locate))
                 signals.window_switch_to_main.emit()
+
             self.thread = StoppableThread(target=_run)
             self.thread.daemon = True
             self.thread.start()
@@ -186,7 +188,3 @@ class SpineAtlasExtractor(UIBase):
             signals.logger_error.emit(str(e))
         finally:
             src_atlas.close()
-
-    def closeEvent(self, event):
-        event.accept()
-        signals.window_closed.emit(UIDef.ImageSpineAtlasExtractor.value)

@@ -5,6 +5,7 @@ from enum import Enum, unique
 class UIDef(Enum):
     FileAboutMe = 1
     FileHelp = 2
+    FileTest = 99
 
     ImageSplit = 101
     ImageCompress = 102
@@ -26,6 +27,7 @@ class UIDef(Enum):
     ToolsAudio = 305
     ToolsVarName = 306
     ToolsPlistMinifier = 307
+    ToolsWeRead = 308
 
     LuaGrammarChecker = 401
     LuaEncodingChecker = 402

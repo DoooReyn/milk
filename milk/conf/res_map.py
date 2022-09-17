@@ -87,6 +87,7 @@ class ResMap:
 	img_square_small = ":/img/square-small.svg"
 	img_square = ":/img/square.svg"
 	img_strikethrough = ":/img/strikethrough.svg"
+	img_switch = ":/img/switch.svg"
 	img_sync = ":/img/sync.svg"
 	img_tag_one = ":/img/tag-one.svg"
 	img_text_bold = ":/img/text-bold.svg"

@@ -57,6 +57,11 @@ class Settings:
                     "name": "item_file_exit_app",
                     "icon": ResMap.img_logout,
                     "trigger": "on_menu_exit_app"
+                },
+                {
+                    "name": "item_file_test_view",
+                    "icon": ResMap.img_bug,
+                    "trigger": "on_menu_test_view"
                 }
             )
 
@@ -162,6 +167,11 @@ class Settings:
                     "name": "item_tools_plist_minify",
                     "trigger": "on_menu_tools_plist_minify",
                     "icon": ResMap.img_compression
+                },
+                {
+                    "name": "item_tools_weread",
+                    "trigger": "on_menu_tools_weread",
+                    "icon": ResMap.img_bookmark_one
                 }
             )
 
@@ -279,6 +289,11 @@ class UserKey:
 
     class TextureUnpacker:
         last_save_at = "last_save_at"
+
+    class Translator:
+        ctranslate2_model = "ctranslate2_model"
+        sentence_piece_model = "sentence_piece_model"
+        fasttext_model = "fasttext_model"
 
 
 local_dir = QStandardPaths.writableLocation(QStandardPaths.AppConfigLocation)

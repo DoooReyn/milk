@@ -33,8 +33,9 @@ if __name__ == '__main__':
                 for item in os.listdir(os.path.join(CUR_DIR, root, d)):
                     f_qrc.write(QRC_FILE_FMT.format(d, item, root))
                     name = str(os.path.splitext(item)[0])
-                    name = name.replace("-", "_")
-                    map_class.append(QRC_MAP_ITEM_FMT.format(name, d, item))
+                    name = name.replace("-", "_").replace('.', '_')
+                    name = QRC_MAP_ITEM_FMT.format(name, d, item)
+                    map_class.append(name)
 
             f_qrc.write(QRC_FOOTER)
 
