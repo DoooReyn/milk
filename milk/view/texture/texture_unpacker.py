@@ -13,7 +13,7 @@ from PyQt5.QtWidgets import QAction, QFileDialog, QGraphicsScene, QGraphicsView,
 
 from milk.cmm import Cmm
 from milk.conf import Lang, LangUI, ResMap, settings, signals, UIDef, UserKey
-from .ui_base import UIBase
+from view.ui_base import UIBase
 
 
 class PlistParser:

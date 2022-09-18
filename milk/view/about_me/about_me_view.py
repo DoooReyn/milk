@@ -42,7 +42,7 @@ ABOUT_ME = """
 """
 
 
-class AboutMe(AboutBaseView):
+class AboutMeView(AboutBaseView):
     def __init__(self, parent: QWidget = None):
         super().__init__(parent, ABOUT_ME)
 

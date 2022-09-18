@@ -3,12 +3,12 @@ from PyQt5.QtWidgets import QApplication, QMainWindow
 from milk.cmm import Cmm
 from milk.conf import LangUI, Settings, signals, UIDef
 from milk.gui import GUI
-from view.about_me.about_me import AboutMe
-from milk.view.spine_atlas_extractor import SpineAtlasExtractor
+from view.about_me.about_me_view import AboutMeView
+from view.spine.spine_atlas_extractor import SpineAtlasExtractor
 from milk.view.translate.translate_view import TranslateView
-from milk.view.texture_unpacker import TextureUnpacker
-from milk.view.wallpaper import UnsplashWallPaper
-from milk.view.weread import WeRead
+from view.texture.texture_unpacker import TextureUnpacker
+from view.wallpaper.wallpaper import UnsplashWallPaper
+from view.weread.weread import WeRead
 from view.main.main_view import MainView
 
 
@@ -67,7 +67,7 @@ class Window(QMainWindow):
         QApplication.aboutQt()
 
     def on_menu_open_about_me(self):
-        AboutMe(self).exec()
+        AboutMeView(self).exec()
 
     def on_menu_tools_weread(self):
         self.open_menu(UIDef.ToolsWeRead, WeRead)

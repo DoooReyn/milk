@@ -12,6 +12,7 @@ class _View(UIBase):
 
         # create widgets
         self.ui_logger = GUI.create_text_browser()
+        self.ui_logger.setTextInteractionFlags(Qt.TextBrowserInteraction)
         self.ui_logger.setStyleSheet(StyleSheet.TextBrowser)
         self.ui_right_panel = QWidget()
         self.ui_btn_clear = GUI.create_push_btn(LangUI.main_ui_btn_clear)
