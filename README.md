@@ -12,9 +12,9 @@
 - ❌ Something about Lua
 - ❌ Something about Cocos2d-x / Cocos Creator
 - ❌ Offline API Docs
-- ❌ Excel to Lua / Json / Xml
-- 整合 GUI API
-- ...
+- ❌ Excel to Lua / Json / Xml 
+- ❌ 密码管理器
+- ❌ 整合 UIBase / Cmm.MsgBox 到 GUI
 
 ## Done
 
@@ -33,3 +33,5 @@
 - ✔ 离线翻译
   
     ![](screenshot/OfflineTranslator.png)
+
+- ✔ 多应用在线文档链接跳转

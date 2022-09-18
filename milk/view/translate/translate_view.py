@@ -6,6 +6,7 @@ from milk.conf import LangUI, ResMap, settings, UserKey
 from milk.conf import UIDef
 from milk.gui import GUI
 from milk.view.ui_base import UIBase
+from .about_view import AboutView
 from .conf import SupportLanguages, URL_FASTTEXT_MODEL, URL_M2M_100_12B, URL_M2M_100_418M
 from .conf import TRANSLATE_BEAM_DEFAULT_ID, TRANSLATE_BEAM_IDS, TRANSLATE_BEAM_SIZES, TRANSLATE_LANGUAGE_ITEMS, \
     TranslateMenus
@@ -145,7 +146,7 @@ class TranslateView(_View):
     def on_radio_toggled(self, rid: int, toggled: bool):
         if toggled is True:
             self.translator.set_beam_size(rid)
-            self.on_translate()
+            # self.on_translate()
 
     def on_copy_result(self):
         if len(self.ui_edit_target.toPlainText()) > 0:
@@ -186,10 +187,8 @@ class TranslateView(_View):
         print('on_menu_open_help', self)
         pass
 
-    @staticmethod
-    def on_menu_open_about():
-        print('on_menu_open_about')
-        pass
+    def on_menu_open_about(self):
+        AboutView(self).exec()
 
     @staticmethod
     def on_menu_download_model_mini():

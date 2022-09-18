@@ -1,4 +1,4 @@
-from milk.conf import ResMap, LangUI
+from milk.conf import LangUI, ResMap
 
 Languages = {
     "Afrikaans": "__af__",
@@ -129,16 +129,6 @@ class TranslateMenus:
                 "name": "translate:menu_file:item_download_fasttext_model",
                 "icon": ResMap.img_arrow_down,
                 "trigger": "on_menu_download_fasttext_model"
-            }
-        )
-
-    class MenuHelp:
-        Name = "translate:menu_help"
-        Actions = (
-            {
-                "name": "translate:menu_help:item_manual",
-                "icon": ResMap.img_helpcenter,
-                "trigger": "on_menu_open_help"
             },
             {
                 "name": "translate:menu_help:item_about",
@@ -147,7 +137,7 @@ class TranslateMenus:
             },
         )
 
-    all = (MenuFile, MenuHelp)
+    all = (MenuFile,)
 
 
 class BeamSize:

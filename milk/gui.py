@@ -3,7 +3,7 @@ from os.path import exists, isdir, isfile
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QFont, QIcon
 from PyQt5.QtWidgets import QAction, QApplication, QButtonGroup, QComboBox, QFileDialog, QGridLayout, QGroupBox, \
-    QHBoxLayout, QLabel, QLineEdit, QMenu, QMenuBar, QPushButton, QRadioButton, QTextEdit, QVBoxLayout, QWidget
+    QHBoxLayout, QLabel, QLineEdit, QMenu, QMenuBar, QPushButton, QRadioButton, QTextEdit, QVBoxLayout, QWidget, QTextBrowser
 
 from cmm import Cmm
 from conf import signals
@@ -194,6 +194,17 @@ class GUI:
         btn = QPushButton(text)
         btn.setFont(GUI.font())
         return btn
+
+    @staticmethod
+    def create_text_browser(markdown: str):
+        browser = QTextBrowser()
+        browser.setReadOnly(True)
+        browser.setAcceptRichText(True)
+        browser.setOpenExternalLinks(True)
+        browser.setTextInteractionFlags(Qt.LinksAccessibleByMouse)
+        browser.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        browser.setMarkdown(markdown)
+        return browser
 
     @staticmethod
     def add_grid_in_row(layout: QGridLayout, row: int, items: Iterable[GridItem]):
