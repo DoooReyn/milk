@@ -3,7 +3,7 @@ from PyQt5.QtCore import Qt
 
 from milk.conf import LangUI, LogColor, LogLevel, settings, signals, StyleSheet, UserKey
 from milk.gui import GUI
-from .ui_base import UIBase
+from view.ui_base import UIBase
 
 
 class _View(UIBase):
@@ -40,9 +40,9 @@ class _View(UIBase):
         self.ui_right_layout.addWidget(self.ui_btn_fatal)
 
 
-class MainUI(_View):
+class MainView(_View):
     def __init__(self):
-        super(MainUI, self).__init__()
+        super(MainView, self).__init__()
 
         self.setup_ui_status()
         self.setup_ui_signals()

@@ -10,7 +10,7 @@ from milk.view.translate.translate_view import TranslateView
 from milk.view.texture_unpacker import TextureUnpacker
 from milk.view.wallpaper import UnsplashWallPaper
 from milk.view.weread import WeRead
-from .main_ui import MainUI
+from view.main.main_view import MainView
 
 
 class Window(QMainWindow):
@@ -51,7 +51,7 @@ class Window(QMainWindow):
         self.move(x, y)
 
     def set_ui(self):
-        self.setCentralWidget(MainUI())
+        self.setCentralWidget(MainView())
         self.setMenuBar(GUI.create_menu_bar(Settings.Menus, self))
 
     @staticmethod
