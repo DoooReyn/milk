@@ -4,13 +4,89 @@ from typing import Optional
 
 from ctranslate2 import contains_model, Translator
 from fasttext import FastText, load_model
+from indicnlp.tokenize.sentence_tokenize import sentence_split
 from numpy import array, array_split
+from pysbd import Segmenter
+from sentence_splitter import split_text_into_sentences
 from sentencepiece import SentencePieceProcessor
 
-from milk.conf import settings, signals, UserKey
-from .conf import BeamSize, DETECT_CHARS_LIMIT, SHARED_VOCABULARY_NAME, SupportLanguages, TRANSLATOR_DEVICE
-from .paragraph_splitter import paragraph_detokenizer, paragraph_tokenizer
 from milk.cmm import MsgBox
+from milk.conf import settings, UserKey, LangUI
+from .conf import BeamSize, DETECT_CHARS_LIMIT, SHARED_VOCABULARY_NAME, SupportLanguages, TRANSLATOR_DEVICE
+
+
+def paragraph_tokenizer(text, language="en"):
+    """Replace sentences with their indexes, and store indexes of newlines
+    Args:
+        text (str): Text to be indexed
+        language (str): Language to be indexed
+
+    Returns:
+        sentences (list): List of sentences
+        breaks (list): List of indexes of sentences and newlines
+    """
+
+    languages_splitter = ["ca", "cs", "da", "de", "el", "en", "es", "fi", "fr", "hu", "is", "it",
+                          "lt", "lv", "nl", "no", "pl", "pt", "ro", "ru", "sk", "sl", "sv", "tr"]
+    languages_indic = ["as", "bn", "gu", "hi", "kK", "kn", "ml", "mr", "ne", "or", "pa", "sa",
+                       "sd", "si", "ta", "te"]
+    languages_pysbd = ["en", "hi", "mr", "zh", "es", "am", "ar", "hy", "bg", "ur", "ru", "pl",
+                       "fa", "nl", "da", "fr", "my", "el", "it", "ja", "de", "kk", "sk"]
+
+    languages = languages_splitter + languages_indic + languages_pysbd
+    language = language if language in languages else "en"
+
+    text = text.strip()
+    paragraphs = text.splitlines(True)
+
+    breaks = []
+    sentences = []
+
+    for paragraph in paragraphs:
+        if paragraph == "\n":
+            breaks.append("\n")
+        else:
+            paragraph_sentences = []
+            if language in languages_pysbd:
+                segmenter = Segmenter(language=language, clean=True)
+                paragraph_sentences = segmenter.segment(paragraph)
+            elif language in languages_splitter:
+                paragraph_sentences = split_text_into_sentences(paragraph, language)
+            elif language in languages_indic:
+                paragraph_sentences = sentence_split(paragraph, language)
+
+            breaks.extend(
+                list(range(len(sentences), len(sentences) + len(paragraph_sentences)))
+            )
+            breaks.append("\n")
+            sentences.extend(paragraph_sentences)
+
+    # Remove the last newline
+    breaks = breaks[:-1]
+
+    return sentences, breaks
+
+
+def paragraph_detokenizer(sentences: list[str], breaks):
+    """Restore original paragraph format from indexes of sentences and newlines
+
+    Args:
+        sentences (list): List of sentences
+        breaks (list): List of indexes of sentences and newlines
+
+    Returns:
+        text (str): Text with original format
+    """
+    output = []
+
+    for br in breaks:
+        if br == "\n":
+            output.append("\n")
+        else:
+            output.append(sentences[br] + " ")
+
+    text = "".join(output)
+    return text
 
 
 class ModelTranslator:
@@ -29,7 +105,7 @@ class ModelTranslator:
 
     @staticmethod
     def dump(msg: str):
-        MsgBox.msg(msg, '离线翻译')
+        MsgBox.msg(msg, LangUI.translate_title)
 
     def setup(self):
         self.set_c_model(settings.value(UserKey.Translator.ctranslate2_model, '', str))
@@ -40,7 +116,7 @@ class ModelTranslator:
         try:
             if exists(model_at) and isdir(model_at):
                 if not exists(join(model_at, 'model.bin')):
-                    self.dump('Ctranslate2 模型 model.bin 未找到')
+                    self.dump(LangUI.translate_ctranslate2_not_found)
                     return False
 
                 if contains_model(model_at):
@@ -53,7 +129,7 @@ class ModelTranslator:
                     else:
                         self.v_m2m_100 = False
                 if self.v_m2m_100 is False:
-                    self.dump('无效的 M2M-100 模型: {0}'.format(SHARED_VOCABULARY_NAME))
+                    self.dump(LangUI.translate_vocabulary_not_found.format(SHARED_VOCABULARY_NAME))
                 self.c_translator = Translator(
                     model_at,
                     TRANSLATOR_DEVICE,
@@ -64,10 +140,10 @@ class ModelTranslator:
                 settings.setValue(UserKey.Translator.ctranslate2_model, model_at)
                 return True
             else:
-                self.dump('无效的 Ctranslate2 模型: {0}'.format(model_at))
+                self.dump(LangUI.translate_invalid_ctranslate2.format(model_at))
                 return False
         except Exception as e:
-            self.dump('无效的 Ctranslate2 模型: {0}'.format(model_at))
+            self.dump(LangUI.translate_invalid_ctranslate2.format(model_at))
             self.dump(str(e))
             return False
 
@@ -79,7 +155,7 @@ class ModelTranslator:
             settings.setValue(UserKey.Translator.sentence_piece_model, model_at)
             return True
         else:
-            self.dump('无效的 SentencePiece 模型: {0}'.format(model_at))
+            self.dump(LangUI.translate_invalid_sentence_piece.format(model_at))
             return False
 
     def set_f_model(self, model_at: str):
@@ -89,12 +165,12 @@ class ModelTranslator:
             settings.setValue(UserKey.Translator.fasttext_model, model_at)
             return True
         else:
-            self.dump('无效的 Fasttext 模型路径: {0}'.format(model_at))
+            self.dump(LangUI.translate_invalid_fasttext.format(model_at))
             return False
 
     def detect_language(self, text: str):
         if self.f_prediction is None:
-            self.dump('FastText 模型未设置')
+            self.dump(LangUI.translate_unset_of_fasttext)
             return ()
 
         text = text[:DETECT_CHARS_LIMIT] if len(text) > DETECT_CHARS_LIMIT else text
@@ -102,7 +178,7 @@ class ModelTranslator:
         prediction = model.predict(text, k=2)
         code1 = prediction[0][0][9:]
         code2 = prediction[0][1][9:]
-        print('预测：', prediction)
+        # print('预测：', prediction)
         return code1, code2
 
     def set_beam_size(self, size: int):
@@ -110,23 +186,23 @@ class ModelTranslator:
 
     def translate(self, source_code: str, target_code: str, text: str):
         if len(text) == 0:
-            self.dump('请输入需要翻译的内容')
+            self.dump(LangUI.translate_input_content)
             return
 
         if self.s_processor is None:
-            self.dump('SentencePiece 模型未设置')
+            self.dump(LangUI.translate_unset_of_sentence_piece)
             return
 
         if self.c_translator is None:
-            self.dump('Ctranslate2 模型未设置')
+            self.dump(LangUI.translate_unset_of_ctranslate2)
             return
 
         if self.f_prediction is None:
-            self.dump('FastText 模型未设置')
+            self.dump(LangUI.translate_unset_of_fasttext)
             return
 
         if target_code not in SupportLanguages:
-            self.dump('不支持的目标语言: {}'.format(target_code))
+            self.dump(LangUI.translate_unsupported_language.format(target_code))
             return
 
         sentences, breaks = paragraph_tokenizer(text, source_code)
@@ -170,4 +246,4 @@ class ModelTranslator:
                     source_code = _code
                     break
             return self.translate(source_code, target_code, text)
-        return '<b style="color:red;">翻译失败</b>'
+        return LangUI.translate_convert_failed

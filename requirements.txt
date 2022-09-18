@@ -47,3 +47,4 @@ oauthlib~=2.0.1
 alabaster~=0.7.12
 pyparsing~=3.0.9
 readmdict~=0.1.1
+system_hotkey~=1.0.3
