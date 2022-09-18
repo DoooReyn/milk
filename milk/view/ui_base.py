@@ -30,28 +30,6 @@ class UIBase(QWidget):
     def setup_signals(self):
         pass
 
-    @property
-    def default_font(self):
-        font = QFont()
-        font.setPointSize(10)
-        return font
-
-    @property
-    def default_height(self):
-        return 36
-
-    @property
-    def default_layout_spacing(self):
-        return 8
-
-    @property
-    def default_button_size(self):
-        return QSize(84, 36)
-
-    @property
-    def default_minimum_width(self):
-        return 400
-
     # noinspection PyMethodMayBeStatic
     def add_widget(self, parent: QWidget):
         child = QWidget()
@@ -62,62 +40,68 @@ class UIBase(QWidget):
         self.layout().addWidget(child)
         return child
 
-    def add_grid_layout(self, parent: QWidget):
+    @staticmethod
+    def add_grid_layout(parent: QWidget):
         layout = QGridLayout()
-        layout.setSpacing(self.default_layout_spacing)
+        layout.setSpacing(GUI.layout_spacing)
         parent.setLayout(layout)
         return layout
 
-    def add_horizontal_layout(self, parent: QWidget):
+    @staticmethod
+    def add_horizontal_layout(parent: QWidget):
         layout = QHBoxLayout()
         layout.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
-        layout.setSpacing(self.default_layout_spacing)
+        layout.setSpacing(GUI.layout_spacing)
         parent.setLayout(layout)
         return layout
 
-    def add_vertical_layout(self, parent: QWidget):
+    @staticmethod
+    def add_vertical_layout(parent: QWidget):
         layout = QVBoxLayout()
         layout.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
-        layout.setSpacing(self.default_layout_spacing)
+        layout.setSpacing(GUI.layout_spacing)
         parent.setLayout(layout)
         return layout
 
-    def add_label(self, text: str, parent: QWidget):
+    @staticmethod
+    def add_label(text: str, parent: QWidget):
         child = QLabel(text)
         child.setAlignment(Qt.AlignCenter)
-        child.setFixedHeight(self.default_height)
         parent.layout().addWidget(child)
         return child
 
-    def add_line_edit(self, placeholder: str, parent: QWidget):
+    @staticmethod
+    def add_line_edit(placeholder: str, parent: QWidget):
         child = QLineEdit()
-        child.setMinimumWidth(self.default_minimum_width)
-        child.setFont(self.default_font)
-        child.setFixedHeight(self.default_height)
+        child.setMinimumWidth(GUI.minimum_line_width)
+        child.setFont(GUI.font())
         child.setPlaceholderText(placeholder)
         parent.layout().addWidget(child)
         return child
 
-    def add_push_button(self, text, parent: QWidget):
+    @staticmethod
+    def add_push_button(text, parent: QWidget):
         child = QPushButton(text)
-        child.setFixedSize(self.default_button_size)
+        child.setFixedSize(GUI.button_size)
         parent.layout().addWidget(child)
         return child
 
-    def add_check_button(self, text: str, parent: QWidget, checked: bool = True):
+    @staticmethod
+    def add_check_button(text: str, parent: QWidget, checked: bool = True):
         child = QPushButton(text)
-        child.setFixedSize(self.default_button_size)
+        child.setFixedSize(GUI.button_size)
         child.setCheckable(True)
         child.setChecked(checked)
         parent.layout().addWidget(child)
         return child
 
-    def add_text_browser(self, parent: QWidget):
+    @staticmethod
+    def add_text_browser(parent: QWidget):
         child = QTextBrowser()
-        child.setFont(self.default_font)
+        child.setFont(GUI.font())
         child.setReadOnly(True)
         child.setAcceptRichText(True)
-        child.setMinimumHeight(self.default_minimum_width)
+        child.setMinimumHeight(GUI.minimum_line_width)
         parent.layout().addWidget(child)
         return child
 

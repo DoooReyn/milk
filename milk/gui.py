@@ -1,13 +1,13 @@
 from os.path import exists, isdir, isfile
 
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtGui import QFont, QIcon
 from PyQt5.QtWidgets import QAction, QApplication, QButtonGroup, QComboBox, QFileDialog, QGridLayout, QGroupBox, \
-    QHBoxLayout, QLabel, QLineEdit, QMenu, QMenuBar, QPushButton, QRadioButton, QTextEdit, QVBoxLayout, QWidget, QTextBrowser
+    QHBoxLayout, QLabel, QLineEdit, QMenu, QMenuBar, QPushButton, QRadioButton, QTextBrowser, QTextEdit, QVBoxLayout, \
+    QWidget
 
 from cmm import Cmm
-from conf import signals
-from conf.lang import Lang, LangUI
+from conf import signals, Lang, LangUI, StyleSheet
 
 try:
     from collections import Iterable
@@ -31,6 +31,12 @@ class GUI:
     layout_spacing = 8
 
     font_size = 11
+
+    line_height = 36
+
+    button_size = QSize(84, 36)
+
+    minimum_line_width = 400
 
     font_name = 'Microsoft YaHei'
 
@@ -196,7 +202,16 @@ class GUI:
         return btn
 
     @staticmethod
-    def create_text_browser(markdown: str):
+    def create_check_button(text: str, checked: bool = True):
+        child = GUI.create_push_btn(text)
+        child.setFixedSize(GUI.button_size)
+        child.setCheckable(True)
+        child.setChecked(checked)
+        child.setStyleSheet(StyleSheet.CheckButton)
+        return child
+
+    @staticmethod
+    def create_text_browser(markdown: str = ''):
         browser = QTextBrowser()
         browser.setReadOnly(True)
         browser.setAcceptRichText(True)

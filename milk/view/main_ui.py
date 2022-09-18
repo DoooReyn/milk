@@ -1,42 +1,53 @@
-from typing import Union
+from PyQt5.QtWidgets import QPushButton, QWidget
+from PyQt5.QtCore import Qt
 
-from PyQt5.QtWidgets import QWidget, QTextBrowser, QPushButton
-
-from milk.conf import LangUI, StyleSheet, LogLevel, LogColor, signals, settings, UserKey
+from milk.conf import LangUI, LogColor, LogLevel, settings, signals, StyleSheet, UserKey
+from milk.gui import GUI
 from .ui_base import UIBase
 
 
-class MainUI(UIBase):
-
+class _View(UIBase):
     def __init__(self):
-        self.ui_logger: Union[QTextBrowser, None] = None
-        self.ui_right_panel: Union[QWidget, None] = None
-        self.ui_btn_clear: Union[QPushButton, None] = None
-        self.ui_btn_trace: Union[QPushButton, None] = None
-        self.ui_btn_debug: Union[QPushButton, None] = None
-        self.ui_btn_info: Union[QPushButton, None] = None
-        self.ui_btn_warn: Union[QPushButton, None] = None
-        self.ui_btn_error: Union[QPushButton, None] = None
-        self.ui_btn_fatal: Union[QPushButton, None] = None
+        super(_View, self).__init__()
 
+        # create widgets
+        self.ui_logger = GUI.create_text_browser()
+        self.ui_logger.setStyleSheet(StyleSheet.TextBrowser)
+        self.ui_right_panel = QWidget()
+        self.ui_btn_clear = GUI.create_push_btn(LangUI.main_ui_btn_clear)
+        self.ui_lab_level = GUI.create_label(LangUI.main_ui_lab_log_level)
+        self.ui_lab_level.setFixedHeight(6)
+        self.ui_btn_trace = GUI.create_check_button(LangUI.main_ui_btn_trace)
+        self.ui_btn_debug = GUI.create_check_button(LangUI.main_ui_btn_debug)
+        self.ui_btn_info = GUI.create_check_button(LangUI.main_ui_btn_info)
+        self.ui_btn_warn = GUI.create_check_button(LangUI.main_ui_btn_warn)
+        self.ui_btn_error = GUI.create_check_button(LangUI.main_ui_btn_error)
+        self.ui_btn_fatal = GUI.create_check_button(LangUI.main_ui_btn_fatal)
+
+        # layout widgets
+        self.ui_layout = GUI.create_horizontal_layout(self)
+        self.ui_layout.addWidget(self.ui_logger)
+        self.ui_layout.addWidget(self.ui_right_panel)
+        self.ui_right_layout = GUI.create_vertical_layout(self.ui_right_panel)
+        self.ui_right_layout.setAlignment(Qt.AlignTop)
+        self.ui_right_layout.addWidget(self.ui_btn_clear)
+        self.ui_right_layout.addWidget(self.ui_lab_level)
+        self.ui_right_layout.addWidget(self.ui_btn_trace)
+        self.ui_right_layout.addWidget(self.ui_btn_debug)
+        self.ui_right_layout.addWidget(self.ui_btn_info)
+        self.ui_right_layout.addWidget(self.ui_btn_warn)
+        self.ui_right_layout.addWidget(self.ui_btn_error)
+        self.ui_right_layout.addWidget(self.ui_btn_fatal)
+
+
+class MainUI(_View):
+    def __init__(self):
         super(MainUI, self).__init__()
 
-    def setup_ui(self):
-        self.add_horizontal_layout(self)
-        self.ui_logger = self.add_text_browser(self)
-        self.ui_right_panel = self.add_widget(self)
-        self.add_vertical_layout(self.ui_right_panel)
-        self.ui_btn_clear = self.add_push_button(LangUI.main_ui_btn_clear, self.ui_right_panel)
-        self.add_label(LangUI.main_ui_lab_log_level, self.ui_right_panel).setFixedHeight(6)
-        self.ui_btn_trace = self.add_check_button(LangUI.main_ui_btn_trace, self.ui_right_panel)
-        self.ui_btn_debug = self.add_check_button(LangUI.main_ui_btn_debug, self.ui_right_panel)
-        self.ui_btn_info = self.add_check_button(LangUI.main_ui_btn_info, self.ui_right_panel)
-        self.ui_btn_warn = self.add_check_button(LangUI.main_ui_btn_warn, self.ui_right_panel)
-        self.ui_btn_error = self.add_check_button(LangUI.main_ui_btn_error, self.ui_right_panel)
-        self.ui_btn_fatal = self.add_check_button(LangUI.main_ui_btn_fatal, self.ui_right_panel)
+        self.setup_ui_status()
+        self.setup_ui_signals()
 
-        self.ui_logger.setStyleSheet(StyleSheet.TextBrowser)
-
+    def setup_ui_status(self):
         self.ui_btn_trace.setChecked(settings.value(UserKey.Main.log_trace, True, bool))
         self.ui_btn_debug.setChecked(settings.value(UserKey.Main.log_debug, True, bool))
         self.ui_btn_info.setChecked(settings.value(UserKey.Main.log_info, True, bool))
@@ -44,9 +55,8 @@ class MainUI(UIBase):
         self.ui_btn_error.setChecked(settings.value(UserKey.Main.log_error, True, bool))
         self.ui_btn_fatal.setChecked(settings.value(UserKey.Main.log_fatal, True, bool))
 
-    def setup_signals(self):
-        self.ui_btn_clear.clicked.connect(self.on_btn_clear)
-
+    def setup_ui_signals(self):
+        self.ui_btn_clear.clicked.connect(lambda: self.ui_logger.clear())
         self.ui_btn_trace.clicked.connect(lambda state: self.on_btn_checked(self.ui_btn_trace, LogLevel.trace,
                                                                             UserKey.Main.log_trace))
         self.ui_btn_debug.clicked.connect(lambda state: self.on_btn_checked(self.ui_btn_debug, LogLevel.debug,
@@ -59,16 +69,12 @@ class MainUI(UIBase):
                                                                             UserKey.Main.log_error))
         self.ui_btn_fatal.clicked.connect(lambda state: self.on_btn_checked(self.ui_btn_fatal, LogLevel.fatal,
                                                                             UserKey.Main.log_fatal))
-
         signals.logger_trace.connect(lambda msg: self.add_log(LogLevel.trace, msg))
         signals.logger_debug.connect(lambda msg: self.add_log(LogLevel.debug, msg))
         signals.logger_info.connect(lambda msg: self.add_log(LogLevel.info, msg))
         signals.logger_warn.connect(lambda msg: self.add_log(LogLevel.warn, msg))
         signals.logger_error.connect(lambda msg: self.add_log(LogLevel.error, msg))
         signals.logger_fatal.connect(lambda msg: self.add_log(LogLevel.fatal, msg))
-
-    def on_btn_clear(self):
-        self.ui_logger.clear()
 
     def on_btn_checked(self, btn: QPushButton, level: LogLevel, key: str):
         msg = LangUI.msg_enabled if btn.isChecked() else LangUI.msg_disabled
