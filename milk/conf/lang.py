@@ -81,6 +81,8 @@ class LangUI:
     msg_all_extracted = "[{0}] 全部提取完成！"
     msg_one_extracted = "[{0}] 提取完成！"
 
+    view_about_me = "关于我"
+
     main_ui_btn_clear = "清空"
     main_ui_lab_log_level = "—————"
     main_ui_btn_trace = "Trace"

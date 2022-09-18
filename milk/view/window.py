@@ -68,7 +68,7 @@ class Window(QMainWindow):
         QApplication.aboutQt()
 
     def on_menu_open_about_me(self):
-        self.open_menu(UIDef.FileAboutMe, AboutMe)
+        AboutMe(self).exec()
 
     def on_menu_tools_weread(self):
         self.open_menu(UIDef.ToolsWeRead, WeRead)

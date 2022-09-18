@@ -1,10 +1,7 @@
-from typing import Union
+from PyQt5.QtWidgets import QWidget
 
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QWidget, QTextBrowser
-
-from milk.conf import signals, UIDef
-from milk.view.ui_base import UIBase
+from milk.conf import LangUI
+from milk.view.about_view_base import AboutBaseView
 
 ABOUT_ME = """
 ### Hi, there! 🤠 I'm DoooReyn.
@@ -45,19 +42,9 @@ ABOUT_ME = """
 """
 
 
-class AboutMe(UIBase):
+class AboutMe(AboutBaseView):
     def __init__(self, parent: QWidget = None):
-        super().__init__(parent)
-        self.ui_text_browser: Union[QTextBrowser, None] = None
-        self.setup_window_code(UIDef.FileAboutMe.value)
+        super().__init__(parent, ABOUT_ME)
 
-    def setup_ui(self):
-        self.add_vertical_layout(self)
-        self.ui_text_browser = self.add_text_browser(self)
-        self.ui_text_browser.setReadOnly(True)
-        self.ui_text_browser.setTextInteractionFlags(Qt.TextInteractionFlag.LinksAccessibleByMouse)
-        self.ui_text_browser.setAcceptRichText(True)
-        self.ui_text_browser.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        self.ui_text_browser.setOpenExternalLinks(True)
-        self.ui_text_browser.setMarkdown(ABOUT_ME)
-        self.setFixedSize(520, 520)
+        self.setWindowTitle(LangUI.view_about_me)
+        self.setFixedSize(600, 472)
