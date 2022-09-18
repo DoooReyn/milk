@@ -5,7 +5,6 @@ from milk.conf import LangUI, Settings, signals, UIDef
 from milk.gui import GUI
 from view.about_me.about_me import AboutMe
 from milk.view.spine_atlas_extractor import SpineAtlasExtractor
-from milk.view.TestView import TestView
 from milk.view.translate.translate_view import TranslateView
 from milk.view.texture_unpacker import TextureUnpacker
 from milk.view.wallpaper import UnsplashWallPaper
@@ -72,9 +71,6 @@ class Window(QMainWindow):
 
     def on_menu_tools_weread(self):
         self.open_menu(UIDef.ToolsWeRead, WeRead)
-
-    def on_menu_test_view(self):
-        self.open_menu(UIDef.FileTest, TestView)
 
     def on_menu_tools_translate(self):
         self.open_menu(UIDef.ToolsTranslate, TranslateView)

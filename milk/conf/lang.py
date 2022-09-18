@@ -6,7 +6,6 @@ Lang = dict({
     "item_file_about_qt": "关于Qt",
     "item_file_about_me": "关于我",
     "item_file_help": "帮助",
-    "item_file_test_view": "测试",
 
     "menu_image": "图片",
     "item_image_split": "图片分割器",

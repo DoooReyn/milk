@@ -58,11 +58,6 @@ class Settings:
                     "icon": ResMap.img_logout,
                     "trigger": "on_menu_exit_app"
                 },
-                {
-                    "name": "item_file_test_view",
-                    "icon": ResMap.img_bug,
-                    "trigger": "on_menu_test_view"
-                }
             )
 
         class MenuImage:
