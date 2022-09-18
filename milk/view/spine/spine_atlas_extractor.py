@@ -10,7 +10,7 @@ from PyQt5.QtWidgets import QFileDialog, QLineEdit, QPushButton, QWidget
 
 from milk.cmm import StoppableThread
 from milk.conf import Lang, LangUI, settings, signals, UIDef, UserKey
-from view.ui_base import UIBase
+from milk.view.ui_base import UIBase
 
 
 class SpineAtlasExtractor(UIBase):

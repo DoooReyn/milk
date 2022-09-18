@@ -1,12 +1,12 @@
 import sys
 from traceback import format_exception
 
-from PyQt5.QtGui import QIcon, QFont
+from PyQt5.QtGui import QFont, QIcon
 from PyQt5.QtWidgets import QApplication
 
 from milk.cmm import Cmm
-from milk.conf import Settings, ResMap, signals
-from .window import Window
+from milk.conf import ResMap, Settings, signals
+from milk.view.window import Window
 
 
 class App(object):
@@ -20,6 +20,7 @@ class App(object):
     def __init__(self):
         self.old_hook = sys.excepthook
         sys.excepthook = self.catch_error
+
         Cmm.create_app_cache_dir()
 
         self.app = QApplication(sys.argv)

@@ -3,13 +3,13 @@ from PyQt5.QtWidgets import QApplication, QMainWindow
 from milk.cmm import Cmm
 from milk.conf import LangUI, Settings, signals, UIDef
 from milk.gui import GUI
-from view.about_me.about_me_view import AboutMeView
-from view.spine.spine_atlas_extractor import SpineAtlasExtractor
+from milk.view.about_me.about_me_view import AboutMeView
+from milk.view.main.main_view import MainView
+from milk.view.spine.spine_atlas_extractor import SpineAtlasExtractor
+from milk.view.texture.texture_unpacker import TextureUnpacker
 from milk.view.translate.translate_view import TranslateView
-from view.texture.texture_unpacker import TextureUnpacker
-from view.wallpaper.wallpaper import UnsplashWallPaper
-from view.weread.weread import WeRead
-from view.main.main_view import MainView
+from milk.view.wallpaper.wallpaper import UnsplashWallPaper
+from milk.view.weread.weread import WeRead
 
 
 class Window(QMainWindow):

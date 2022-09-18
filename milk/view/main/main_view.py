@@ -3,7 +3,7 @@ from PyQt5.QtCore import Qt
 
 from milk.conf import LangUI, LogColor, LogLevel, settings, signals, StyleSheet, UserKey
 from milk.gui import GUI
-from view.ui_base import UIBase
+from milk.view.ui_base import UIBase
 
 
 class _View(UIBase):

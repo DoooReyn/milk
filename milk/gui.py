@@ -6,8 +6,8 @@ from PyQt5.QtWidgets import QAction, QApplication, QButtonGroup, QComboBox, QFil
     QHBoxLayout, QLabel, QLineEdit, QMenu, QMenuBar, QPushButton, QRadioButton, QTextBrowser, QTextEdit, QVBoxLayout, \
     QWidget
 
-from cmm import Cmm
-from conf import signals, Lang, LangUI, StyleSheet
+from milk.cmm import Cmm
+from milk.conf import Lang, LangUI, signals, StyleSheet
 
 try:
     from collections import Iterable
