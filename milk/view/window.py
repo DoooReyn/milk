@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow
 from milk.cmm import Cmm
 from milk.conf import LangUI, Settings, signals, UIDef
 from milk.gui import GUI
-from milk.view.about_me import AboutMe
+from view.about_me.about_me import AboutMe
 from milk.view.spine_atlas_extractor import SpineAtlasExtractor
 from milk.view.TestView import TestView
 from milk.view.translate.translate_view import TranslateView
