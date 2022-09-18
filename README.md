@@ -8,12 +8,12 @@
 ## TODO
 
 - ❌ Random reward for private use
-- ❌ Translator
 - ❌ Simple TODOs
 - ❌ Something about Lua
 - ❌ Something about Cocos2d-x / Cocos Creator
 - ❌ Offline API Docs
 - ❌ Excel to Lua / Json / Xml
+- 整合 GUI API
 - ...
 
 ## Done
@@ -29,3 +29,7 @@
 - ✔ Plist 合图提取器
 
     ![](screenshot/TextureUnpacker.png)
+
+- ✔ 离线翻译
+  
+    ![](screenshot/OfflineTranslator.png)

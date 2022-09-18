@@ -107,11 +107,6 @@ class ModelTranslator:
     def dump(msg: str):
         MsgBox.msg(msg, LangUI.translate_title)
 
-    def setup(self):
-        self.set_c_model(settings.value(UserKey.Translator.ctranslate2_model, '', str))
-        self.set_s_model(settings.value(UserKey.Translator.sentence_piece_model, '', str))
-        self.set_f_model(settings.value(UserKey.Translator.fasttext_model, '', str))
-
     def set_c_model(self, model_at: str):
         try:
             if exists(model_at) and isdir(model_at):
@@ -137,7 +132,6 @@ class ModelTranslator:
                     intra_threads=self.intra_threads
                 )
                 self.c_model_at = model_at
-                settings.setValue(UserKey.Translator.ctranslate2_model, model_at)
                 return True
             else:
                 self.dump(LangUI.translate_invalid_ctranslate2.format(model_at))
@@ -152,7 +146,6 @@ class ModelTranslator:
             self.s_processor = SentencePieceProcessor()
             self.s_processor.Init(model_at)
             self.s_model_at = model_at
-            settings.setValue(UserKey.Translator.sentence_piece_model, model_at)
             return True
         else:
             self.dump(LangUI.translate_invalid_sentence_piece.format(model_at))
@@ -162,7 +155,6 @@ class ModelTranslator:
         if exists(model_at) and isfile(model_at):
             self.f_prediction = load_model(model_at)
             self.f_model_at = model_at
-            settings.setValue(UserKey.Translator.fasttext_model, model_at)
             return True
         else:
             self.dump(LangUI.translate_invalid_fasttext.format(model_at))
@@ -209,7 +201,6 @@ class ModelTranslator:
         n_splits = round((len(sentences) / 8) + 0.5)
         splits = array_split(array(sentences), n_splits)
         splits = [split.tolist() for split in splits]
-        translations = []
         results = []
         for split in splits:
             tgt_prefix = [[target_code]] * len(split)
@@ -228,11 +219,11 @@ class ModelTranslator:
                 target_prefix=tgt_prefix,
             )
             translations_so_far = [
-                ' '.join(tokens[0]['tokens']).replace(' ', '').replace('▁', '')[start_pos:].strip()
+                ' '.join(tokens[0]['tokens']).replace(' ', '').replace('▁', ' ')[start_pos:].strip()
                 for tokens in translation_tokens
             ]
-            translations.extend(translations_so_far)
-            translations_formatted = paragraph_detokenizer(translations, breaks)
+            # [print(tokens) for tokens in translation_tokens]
+            translations_formatted = paragraph_detokenizer(translations_so_far, breaks)
             results.append(translations_formatted)
         return '\n'.join(results)
 

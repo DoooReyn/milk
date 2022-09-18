@@ -6,7 +6,7 @@ from milk.gui import GUI
 from milk.view.about_me import AboutMe
 from milk.view.spine_atlas_extractor import SpineAtlasExtractor
 from milk.view.TestView import TestView
-from milk.view.translate.translate import TranslateView
+from milk.view.translate.translate_view import TranslateView
 from milk.view.texture_unpacker import TextureUnpacker
 from milk.view.wallpaper import UnsplashWallPaper
 from milk.view.weread import WeRead

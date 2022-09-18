@@ -56,8 +56,9 @@ Lang = dict({
     "translate:menu_file": "文件",
     "translate:menu_file:item_select_ctranslate2_model": "加载 Ctranslate2 模型",
     "translate:menu_file:item_select_sentence_piece_model": "加载 SentencePiece 模型",
-    "translate:menu_file:item_download_model_mini": "下载精简模型",
-    "translate:menu_file:item_download_model_big": "下载完整模型",
+    "translate:menu_file:item_download_model_mini": "下载 CTranslate2 精简模型",
+    "translate:menu_file:item_download_model_big": "下载 CTranslate2 完整模型",
+    "translate:menu_file:item_download_fasttext_model": "下载 FastText 模型",
 
     "translate:menu_help": "帮助",
     "translate:menu_help:item_manual": "手册",

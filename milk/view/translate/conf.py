@@ -1,4 +1,4 @@
-from milk.conf import ResMap
+from milk.conf import ResMap, LangUI
 
 Languages = {
     "Afrikaans": "__af__",
@@ -124,6 +124,11 @@ class TranslateMenus:
                 "name": "translate:menu_file:item_download_model_big",
                 "icon": ResMap.img_arrow_down,
                 "trigger": "on_menu_download_model_big"
+            },
+            {
+                "name": "translate:menu_file:item_download_fasttext_model",
+                "icon": ResMap.img_arrow_down,
+                "trigger": "on_menu_download_fasttext_model"
             }
         )
 
@@ -160,3 +165,26 @@ DETECT_CHARS_LIMIT = 100
 URL_M2M_100_418M = 'https://pretrained-nmt-models.s3.us-west-2.amazonaws.com/CTranslate2/m2m100/m2m100_ct2_418m.zip'
 
 URL_M2M_100_12B = 'https://pretrained-nmt-models.s3.us-west-2.amazonaws.com/CTranslate2/m2m100/m2m100_ct2_12b.zip'
+
+URL_FASTTEXT_MODEL = 'https://dl.fbaipublicfiles.com/fasttext/supervised-models/lid.176.ftz'
+
+TRANSLATE_LANGUAGE_ITEMS = (
+    LangUI.translate_lang_en,
+    LangUI.translate_lang_zh,
+    LangUI.translate_lang_ja,
+    LangUI.translate_lang_kr,
+)
+
+TRANSLATE_BEAM_SIZES = (
+    LangUI.translate_quality_3,
+    LangUI.translate_quality_2,
+    LangUI.translate_quality_1,
+)
+
+TRANSLATE_BEAM_IDS = (
+    BeamSize.Excellent,
+    BeamSize.Great,
+    BeamSize.Standard,
+)
+
+TRANSLATE_BEAM_DEFAULT_ID = BeamSize.Excellent
