@@ -10,8 +10,8 @@ from pysbd import Segmenter
 from sentence_splitter import split_text_into_sentences
 from sentencepiece import SentencePieceProcessor
 
-from milk.cmm import MsgBox
-from milk.conf import settings, UserKey, LangUI
+from milk.conf import LangUI
+from milk.gui import GUI
 from .conf import BeamSize, DETECT_CHARS_LIMIT, SHARED_VOCABULARY_NAME, SupportLanguages, TRANSLATOR_DEVICE
 
 
@@ -105,7 +105,7 @@ class ModelTranslator:
 
     @staticmethod
     def dump(msg: str):
-        MsgBox.msg(msg, LangUI.translate_title)
+        GUI.MsgBox.msg(msg, LangUI.translate_title)
 
     def set_c_model(self, model_at: str):
         try:
@@ -167,7 +167,7 @@ class ModelTranslator:
 
         text = text[:DETECT_CHARS_LIMIT] if len(text) > DETECT_CHARS_LIMIT else text
         text = text.lower().replace("\n", "")
-        prediction = model.predict(text, k=2)
+        prediction = self.f_prediction.predict(text, k=2)
         code1 = prediction[0][0][9:]
         code2 = prediction[0][1][9:]
         # print('预测：', prediction)

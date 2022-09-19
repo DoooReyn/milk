@@ -15,7 +15,8 @@ except (AttributeError, ImportError):
 from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtGui import QFont, QIcon
 from PyQt5.QtWidgets import QAction, QApplication, QButtonGroup, QComboBox, QFileDialog, QGridLayout, QGroupBox, \
-    QHBoxLayout, QLabel, QLineEdit, QListWidget, QMenu, QMenuBar, QProgressBar, QPushButton, QRadioButton, QTextBrowser, \
+    QHBoxLayout, QLabel, QLineEdit, QListWidget, QMenu, QMenuBar, QMessageBox, QProgressBar, QPushButton, QRadioButton, \
+    QTextBrowser, \
     QTextEdit, \
     QVBoxLayout, QWidget
 
@@ -43,6 +44,27 @@ class GUI:
 
         def setup_window_code(self, code: int):
             self.window_code = code
+
+    class MsgBox:
+        @staticmethod
+        def ask(msg_text: str, title: str = "Ask", detail: str = "", ico=QMessageBox.Information):
+            return GUI.MsgBox.makeBox(msg_text, title, detail, ico, QMessageBox.Ok | QMessageBox.Cancel)
+
+        @staticmethod
+        def msg(msg_text: str, title: str = "Tips", detail: str = "", ico=QMessageBox.Information):
+            return GUI.MsgBox.makeBox(msg_text, title, detail, ico)
+
+        # noinspection PyBroadException
+        @staticmethod
+        def makeBox(msg_text: str, title: str = "", detail: str = "", ico=QMessageBox.Information,
+                    style=QMessageBox.Ok):
+            msg = QMessageBox()
+            msg.setIcon(ico)
+            msg.setText(msg_text)
+            msg.setWindowTitle(title)
+            msg.setDetailedText(detail)
+            msg.setStandardButtons(style)
+            return msg.exec_()
 
     # region end - class
 

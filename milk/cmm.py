@@ -8,7 +8,6 @@ from traceback import format_exc, print_exc
 
 from PyQt5.QtCore import QStandardPaths, QUrl
 from PyQt5.QtGui import QColor, QDesktopServices
-from PyQt5.QtWidgets import QMessageBox
 
 
 class StoppableThread(Thread):
@@ -118,24 +117,3 @@ class Cmm:
     @staticmethod
     def random_color(alpha: int = 255):
         return QColor(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255), alpha)
-
-
-class MsgBox:
-    @staticmethod
-    def ask(msg_text: str, title: str = "Ask", detail: str = "", ico=QMessageBox.Information):
-        return MsgBox.makeBox(msg_text, title, detail, ico, QMessageBox.Ok | QMessageBox.Cancel)
-
-    @staticmethod
-    def msg(msg_text: str, title: str = "Tips", detail: str = "", ico=QMessageBox.Information):
-        return MsgBox.makeBox(msg_text, title, detail, ico)
-
-    # noinspection PyBroadException
-    @staticmethod
-    def makeBox(msg_text: str, title: str = "", detail: str = "", ico=QMessageBox.Information, style=QMessageBox.Ok):
-        msg = QMessageBox()
-        msg.setIcon(ico)
-        msg.setText(msg_text)
-        msg.setWindowTitle(title)
-        msg.setDetailedText(detail)
-        msg.setStandardButtons(style)
-        return msg.exec_()
