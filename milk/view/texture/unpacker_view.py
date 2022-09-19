@@ -71,16 +71,17 @@ class UnpackerView(_View):
                 for frame in frames:
                     name = frame.get("name")
                     if name == filename:
-                        print("extract 1: ", mode, name, frame)
+                        # print("extract 1: ", mode, name, frame)
                         self.extract_frame(choose_dir, mode, src_image, frame, name)
                         break
             else:
                 for frame in frames:
                     name = frame.get("name")
-                    print("extract 2: ", mode, name, frame)
+                    # print("extract 2: ", mode, name, frame)
                     self.extract_frame(choose_dir, mode, src_image, frame, name)
-        except Exception as e:
-            print("extract failed: ", e)
+        except Exception:
+            # print("extract failed: ", e)
+            pass
         finally:
             if src_image is not None:
                 src_image.close()
@@ -105,7 +106,7 @@ class UnpackerView(_View):
         dst_image.save(save_at)
         dst_image.close()
 
-        print(frame)
+        # print(frame)
 
     def on_request_list_menu(self, position):
         pop_menu = QMenu()
@@ -169,7 +170,7 @@ class UnpackerView(_View):
                 frames = self.plist_data.get("frames")
                 for frame in frames:
                     if frame.get("name") == name:
-                        print("locate " + name + " ...")
+                        # print("locate " + name + " ...")
                         x, y, w, h = frame.get("frame_rect")
                         rect = QRectF(x, y, w, h)
                         self.ui_graphics_scene.click_rect(rect)
