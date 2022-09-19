@@ -13,10 +13,9 @@ from conf import UIDef
 from milk.cmm import Cmm
 from milk.conf import LangUI, settings, signals, UserKey
 from milk.gui import GUI
-from milk.view.ui_base import UIBase
 
 
-class _View(UIBase):
+class _View(GUI.View):
     def __init__(self, parent: QWidget = None):
         super(_View, self).__init__(parent)
 

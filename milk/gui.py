@@ -32,6 +32,18 @@ class GUI:
             self.start = start
             self.col_span = col_span
 
+    class View(QWidget):
+        window_code: int = 0
+
+        def closeEvent(self, event):
+            if self.window_code > 0:
+                signals.window_closed.emit(self.window_code)
+            event.accept()
+            super().closeEvent(event)
+
+        def setup_window_code(self, code: int):
+            self.window_code = code
+
     # region end - class
 
     # region start - property

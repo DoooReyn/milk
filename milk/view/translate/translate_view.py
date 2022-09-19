@@ -5,7 +5,6 @@ from milk.cmm import Cmm
 from milk.conf import LangUI, ResMap, settings, UserKey
 from milk.conf import UIDef
 from milk.gui import GUI
-from milk.view.ui_base import UIBase
 from .about_view import AboutView
 from .conf import SupportLanguages, URL_FASTTEXT_MODEL, URL_M2M_100_12B, URL_M2M_100_418M
 from .conf import TRANSLATE_BEAM_DEFAULT_ID, TRANSLATE_BEAM_IDS, TRANSLATE_BEAM_SIZES, TRANSLATE_LANGUAGE_ITEMS, \
@@ -13,7 +12,7 @@ from .conf import TRANSLATE_BEAM_DEFAULT_ID, TRANSLATE_BEAM_IDS, TRANSLATE_BEAM_
 from .translator import ModelTranslator
 
 
-class _View(UIBase):
+class _View(GUI.View):
     def __init__(self, parent: QWidget = None):
         super(_View, self).__init__(parent)
 

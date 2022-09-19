@@ -1,91 +1,118 @@
 import re
-import time
 from os import makedirs, walk
 from os.path import dirname, exists, isdir, join, splitext
 from shutil import rmtree
-from typing import Union
+from time import sleep
 
 from PIL import Image
-from PyQt5.QtWidgets import QFileDialog, QLineEdit, QPushButton, QWidget
+from PyQt5.QtCore import Qt
 
-from milk.cmm import StoppableThread
-from milk.conf import Lang, LangUI, settings, signals, UIDef, UserKey
-from milk.view.ui_base import UIBase
+from milk.cmm import Cmm, StoppableThread
+from milk.conf import LangUI, settings, signals, UIDef, UserKey
+from milk.gui import GUI
 
 
-class SpineAtlasExtractor(UIBase):
-    def __init__(self, parent: QWidget = None):
-        self.ui_edit_atlas_locate_dir: Union[QLineEdit, None] = None
-        self.ui_btn_atlas_choose: Union[QPushButton, None] = None
-        self.ui_edit_atlas_out_dir: Union[QLineEdit, None] = None
-        self.ui_btn_out_choose: Union[QPushButton, None] = None
-        self.ui_btn_parse: Union[QPushButton, None] = None
+class _View(GUI.View):
+    def __init__(self):
+        super(_View, self).__init__()
+
+        # create widgets
+        self.ui_lab_locate_dir = GUI.create_label(LangUI.atlas_extractor_ui_lab_locate_dir)
+        self.ui_lab_output_dir = GUI.create_label(LangUI.atlas_extractor_ui_lab_output_dir)
+        self.ui_edit_atlas_locate_dir = GUI.create_line_edit(
+            readonly=True,
+            placeholder=LangUI.atlas_extractor_ui_edit_locate_dir)
+        self.ui_edit_atlas_output_dir = GUI.create_line_edit(
+            readonly=True,
+            placeholder=LangUI.atlas_extractor_ui_edit_output_dir)
+        self.ui_btn_parse = GUI.create_push_btn(LangUI.atlas_extractor_ui_btn_parse)
+        self.ui_act_locate_dir = GUI.set_folder_action_for_line_edit(self.ui_edit_atlas_locate_dir)
+        self.ui_act_output_dir = GUI.set_folder_action_for_line_edit(self.ui_edit_atlas_output_dir)
+
+        # layout widget
+        self.ui_layout = GUI.create_grid_layout(self)
+        self.ui_layout.setAlignment(Qt.AlignTop)
+        GUI.add_grid_in_rows(self.ui_layout, [
+            (0, [
+                GUI.GridItem(self.ui_lab_locate_dir, 0, 1),
+                GUI.GridItem(self.ui_edit_atlas_locate_dir, 1, 2),
+            ]),
+            (1, [
+                GUI.GridItem(self.ui_lab_output_dir, 0, 1),
+                GUI.GridItem(self.ui_edit_atlas_output_dir, 1, 2),
+            ]),
+            (2, [
+                GUI.GridItem(self.ui_btn_parse, 1, 1),
+            ])
+        ])
+        GUI.set_grid_span(self.ui_layout, [], [2])
+
+
+class SpineAtlasExtractorView(_View):
+    def __init__(self):
+        super(SpineAtlasExtractorView, self).__init__()
+
+        self.setFixedSize(500, 118)
+        self.setWindowTitle(LangUI.atlas_extractor_title)
         self.setup_window_code(UIDef.ImageSpineAtlasExtractor.value)
+        self.setup_ui_signals()
+        self.setup_preferences()
 
-        super().__init__(parent)
-
-    def setup_ui(self):
-        self.add_vertical_layout(self)
-
-        line1 = self.add_widget(self)
-        self.add_horizontal_layout(line1)
-        self.ui_edit_atlas_locate_dir = self.add_line_edit(LangUI.atlas_extractor_ui_edit_atlas_dir, line1)
-        self.ui_btn_atlas_choose = self.add_push_button(LangUI.atlas_extractor_ui_btn_choose, line1)
-
-        line2 = self.add_widget(self)
-        self.add_horizontal_layout(line2)
-        self.ui_edit_atlas_out_dir = self.add_line_edit(LangUI.atlas_extractor_ui_edit_out_dir, line2)
-        self.ui_btn_out_choose = self.add_push_button(LangUI.atlas_extractor_ui_btn_choose, line2)
-
-        line3 = self.add_widget(self)
-        self.add_horizontal_layout(line3)
-        self.ui_btn_parse = self.add_push_button(LangUI.atlas_extractor_ui_btn_parse, line3)
-
-        self.setWindowTitle(Lang.get("item_image_spine_atlas_extractor"))
-        self.ui_edit_atlas_locate_dir.setText(settings.value(UserKey.SpineAtlasExtractor.atlas_locate_dir, "", str))
-        self.ui_edit_atlas_out_dir.setText(settings.value(UserKey.SpineAtlasExtractor.atlas_out_dir, "", str))
-
-    def setup_signals(self):
-        self.ui_edit_atlas_locate_dir.returnPressed.connect(self.on_sync_atlas_locate_dir)
-        self.ui_edit_atlas_locate_dir.editingFinished.connect(self.on_sync_atlas_locate_dir)
-        self.ui_edit_atlas_out_dir.returnPressed.connect(self.on_sync_atlas_out_dir)
-        self.ui_edit_atlas_out_dir.editingFinished.connect(self.on_sync_atlas_out_dir)
+    def setup_ui_signals(self):
+        self.ui_edit_atlas_locate_dir.textChanged.connect(self.on_sync_atlas_locate_dir)
+        self.ui_edit_atlas_output_dir.textChanged.connect(self.on_sync_atlas_output_dir)
+        self.ui_act_locate_dir.triggered.connect(self.on_choose_locate_dir)
+        self.ui_act_output_dir.triggered.connect(self.on_choose_output_dir)
         self.ui_btn_parse.clicked.connect(self.on_parse)
-        self.ui_btn_atlas_choose.clicked.connect(self.on_choose_locate_dir)
-        self.ui_btn_out_choose.clicked.connect(self.on_choose_out_dir)
+
+    def setup_preferences(self):
+        self.ui_edit_atlas_locate_dir.setText(self.atlas_locate_dir())
+        self.ui_edit_atlas_output_dir.setText(self.atlas_output_dir())
+
+    @staticmethod
+    def atlas_locate_dir():
+        return settings.value(UserKey.SpineAtlasExtractor.atlas_locate_dir, "", str)
+
+    @staticmethod
+    def atlas_output_dir():
+        return settings.value(UserKey.SpineAtlasExtractor.atlas_out_dir, "", str)
 
     def on_sync_atlas_locate_dir(self):
         settings.setValue(UserKey.SpineAtlasExtractor.atlas_locate_dir, self.ui_edit_atlas_locate_dir.text())
+        self.ui_edit_atlas_locate_dir.setCursorPosition(0)
 
-    def on_sync_atlas_out_dir(self):
-        settings.setValue(UserKey.SpineAtlasExtractor.atlas_out_dir, self.ui_edit_atlas_out_dir.text())
+    def on_sync_atlas_output_dir(self):
+        settings.setValue(UserKey.SpineAtlasExtractor.atlas_out_dir, self.ui_edit_atlas_output_dir.text())
+        self.ui_edit_atlas_output_dir.setCursorPosition(0)
 
     def on_choose_locate_dir(self):
-        dir_choose = QFileDialog.getExistingDirectory(self, LangUI.atlas_extractor_ui_edit_atlas_dir,
-                                                      self.ui_edit_atlas_locate_dir.text())
-        if len(dir_choose) > 0:
+        title = LangUI.atlas_extractor_ui_edit_locate_dir
+        where = self.ui_edit_atlas_locate_dir.text()
+        dir_choose = GUI.dialog_for_directory_selection(self, title, where)
+        if dir_choose is not None:
             self.ui_edit_atlas_locate_dir.setText(dir_choose)
-            settings.setValue(UserKey.SpineAtlasExtractor.atlas_locate_dir, dir_choose)
+            self.on_sync_atlas_locate_dir()
 
-    def on_choose_out_dir(self):
-        dir_choose = QFileDialog.getExistingDirectory(self, LangUI.atlas_extractor_ui_edit_out_dir,
-                                                      self.ui_edit_atlas_out_dir.text())
-        if len(dir_choose) > 0:
-            self.ui_edit_atlas_out_dir.setText(dir_choose)
-            settings.setValue(UserKey.SpineAtlasExtractor.atlas_out_dir, dir_choose)
+    def on_choose_output_dir(self):
+        title = LangUI.atlas_extractor_ui_edit_output_dir
+        where = self.ui_edit_atlas_output_dir.text()
+        dir_choose = GUI.dialog_for_directory_selection(self, title, where)
+        if dir_choose is not None:
+            self.ui_edit_atlas_output_dir.setText(dir_choose)
+            self.on_sync_atlas_output_dir()
 
     def on_parse(self):
         atlas_locate_dir = self.ui_edit_atlas_locate_dir.text()
-        atlas_out_dir = self.ui_edit_atlas_out_dir.text()
+        atlas_out_dir = self.ui_edit_atlas_output_dir.text()
 
         if not isdir(atlas_locate_dir):
-            signals.logger_error.emit(LangUI.atlas_extractor_ui_edit_atlas_dir)
+            signals.logger_error.emit(LangUI.atlas_extractor_ui_edit_locate_dir)
             self.ui_edit_atlas_locate_dir.focusWidget()
             return
 
         if not isdir(atlas_out_dir):
-            signals.logger_error.emit(LangUI.atlas_extractor_ui_edit_out_dir)
-            self.ui_edit_atlas_out_dir.focusWidget()
+            signals.logger_error.emit(LangUI.atlas_extractor_ui_edit_output_dir)
+            self.ui_edit_atlas_output_dir.focusWidget()
             return
 
         self.reset_ui(False)
@@ -108,7 +135,7 @@ class SpineAtlasExtractor(UIBase):
                 while len(file_no) > 0:
                     src, dst = file_no.pop()
                     self._parse_file(src, dst)
-                    time.sleep(1)
+                    sleep(1)
                 self.thread.stop()
                 self.thread = None
                 self.reset_ui(True)
@@ -120,8 +147,6 @@ class SpineAtlasExtractor(UIBase):
             self.thread.start()
 
     def reset_ui(self, ok: bool):
-        self.ui_btn_atlas_choose.setEnabled(ok)
-        self.ui_btn_out_choose.setEnabled(ok)
         self.ui_btn_parse.setEnabled(ok)
 
     # noinspection PyMethodMayBeStatic
@@ -136,7 +161,7 @@ class SpineAtlasExtractor(UIBase):
 
         src_atlas.seek(0, 2)
         total = src_atlas.tell()
-        src_atlas.seek(0, 0)
+        src_atlas.seek(0)
 
         try:
             while True:
@@ -184,6 +209,7 @@ class SpineAtlasExtractor(UIBase):
                         fixed_path = full_path
                     split_image.save(join(dst_dir, name + '.png'))
             signals.logger_info.emit(LangUI.msg_one_extracted.format(src_file))
+            Cmm.open_external_file(dst_dir)
         except Exception as e:
             signals.logger_error.emit(str(e))
         finally:

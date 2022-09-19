@@ -1,7 +1,6 @@
 from PyQt5.QtWidgets import QWidget, QDialog
 
 from milk.gui import GUI
-from milk.view.ui_base import UIBase
 
 
 class AboutBaseView(QDialog):

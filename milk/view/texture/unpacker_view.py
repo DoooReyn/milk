@@ -9,13 +9,12 @@ from PyQt5.QtWidgets import QAction, QListWidgetItem, QMenu
 from milk.cmm import Cmm
 from milk.conf import LangUI, settings, signals, UIDef, UserKey
 from milk.gui import GUI
-from milk.view.ui_base import UIBase
 from .conf import UnpackerMenus
 from .graphics_canvas import DroppableGraphicsScene, ResizableGraphicsView
 from .plist_parser import PlistParser
 
 
-class _View(UIBase):
+class _View(GUI.View):
     def __init__(self):
         super(_View, self).__init__()
 

@@ -3,10 +3,9 @@ from PyQt5.QtCore import Qt
 
 from milk.conf import LangUI, LogColor, LogLevel, settings, signals, StyleSheet, UserKey
 from milk.gui import GUI
-from milk.view.ui_base import UIBase
 
 
-class _View(UIBase):
+class _View(GUI.View):
     def __init__(self):
         super(_View, self).__init__()
 

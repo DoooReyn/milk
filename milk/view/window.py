@@ -15,15 +15,14 @@ from milk.view.weread.weread import WeRead
 class Window(QMainWindow):
     def __init__(self):
         super(Window, self).__init__()
-        self.setup()
-        self.set_ui()
-        self.setup_signals()
+        self.setup_ui_widgets()
+        self.setup_ui_signals()
 
         self.windows = {}
         for item in UIDef:
             self.windows.setdefault(item.name, None)
 
-    def setup_signals(self):
+    def setup_ui_signals(self):
         signals.window_closed.connect(self.on_sub_window_closed)
         signals.window_switch_to_main.connect(self.on_switch_to_main)
 
@@ -39,7 +38,10 @@ class Window(QMainWindow):
         else:
             signals.logger_fatal.emit("{0} 未正确关闭!".format(win_def.name))
 
-    def setup(self):
+    def setup_ui_widgets(self):
+        self.setCentralWidget(MainView())
+        self.setMenuBar(GUI.create_menu_bar(Settings.Menus, self))
+
         self.resize(Settings.Sizes.ori_width, Settings.Sizes.ori_height)
 
         rect = QApplication.desktop().availableGeometry(0)
@@ -48,10 +50,6 @@ class Window(QMainWindow):
         self.setMinimumSize(Settings.Sizes.min_width, Settings.Sizes.min_height)
 
         self.move(x, y)
-
-    def set_ui(self):
-        self.setCentralWidget(MainView())
-        self.setMenuBar(GUI.create_menu_bar(Settings.Menus, self))
 
     @staticmethod
     def on_menu_open_cache():

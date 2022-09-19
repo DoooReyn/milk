@@ -111,9 +111,10 @@ class LangUI:
     wallpaper_downloading = "正在下载壁纸: {0}"
 
     atlas_extractor_title = 'Spine Atlas 提取器'
-    atlas_extractor_ui_edit_atlas_dir = "请选择 Spine Atlas 所在目录"
-    atlas_extractor_ui_edit_out_dir = "请选择碎图输出目录"
-    atlas_extractor_ui_btn_choose = "选择"
+    atlas_extractor_ui_lab_locate_dir = '图集目录'
+    atlas_extractor_ui_lab_output_dir = '输出目录'
+    atlas_extractor_ui_edit_locate_dir = "请选择 Spine Atlas 所在目录"
+    atlas_extractor_ui_edit_output_dir = "请选择碎图输出目录"
     atlas_extractor_ui_btn_parse = "解析"
 
     texture_unpacker_title = "Plist 合图提取器"
