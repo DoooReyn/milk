@@ -1,18 +1,15 @@
-import ctypes
+
 import random
 import sys
 from os import listdir, makedirs
-from os.path import abspath, dirname, isdir, join, realpath, splitext
+from os.path import dirname, isdir, join, realpath, splitext
 from shutil import rmtree
 from threading import Event, Thread
 from traceback import format_exc, print_exc
 
-import win32api
-import win32con
 from PyQt5.QtCore import QStandardPaths, QUrl
 from PyQt5.QtGui import QColor, QDesktopServices
 from PyQt5.QtWidgets import QMessageBox
-from win32gui import SystemParametersInfo
 
 
 class StoppableThread(Thread):
@@ -118,32 +115,6 @@ class Cmm:
         root = Cmm.app_cache_dir()
         for d in listdir(root):
             rmtree(join(root, d), ignore_errors=True)
-
-    # noinspection PyBroadException
-    @staticmethod
-    def get_screensize(multiplier=1):
-        try:
-            user32 = ctypes.windll.user32
-            screensize = (user32.GetSystemMetrics(78) * multiplier, user32.GetSystemMetrics(79) * multiplier)
-            print(f"\r[+] Status: Detected virtual monitor size {screensize[0]}x{screensize[1]}.", end="")
-            if multiplier > 1:
-                print(f"\r[+] Status: Multiplying to {screensize} for better quality.", end="")
-            return screensize
-        except:
-            print(f"\r[-] Status: Encountered some problems while detecting your display size.", end="")
-            print_exc()
-
-    # noinspection PyBroadException
-    @staticmethod
-    def set_wallpaper(path):
-        def on_start():
-            key = win32api.RegOpenKeyEx(win32con.HKEY_CURRENT_USER, "Control Panel\\Desktop", 0, win32con.KEY_SET_VALUE)
-            win32api.RegSetValueEx(key, "WallpaperStyle", 0, win32con.REG_SZ, "10")
-            win32api.RegSetValueEx(key, "TileWallpaper", 0, win32con.REG_SZ, "0")
-            SystemParametersInfo(win32con.SPI_SETDESKWALLPAPER, abspath(path), win32con.SPIF_SENDWININICHANGE)
-            win32api.RegCloseKey(key)
-
-        Cmm.trace(on_start)
 
     @staticmethod
     def random_color(alpha: int = 255):

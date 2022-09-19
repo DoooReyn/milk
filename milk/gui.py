@@ -1,18 +1,24 @@
-from os.path import exists, isdir, isfile
+import ctypes
+from os.path import abspath, exists, isdir, isfile
+from traceback import print_exc
 
-from PyQt5.QtCore import QSize, Qt
-from PyQt5.QtGui import QFont, QIcon
-from PyQt5.QtWidgets import QAction, QApplication, QButtonGroup, QComboBox, QFileDialog, QGridLayout, QGroupBox, \
-    QHBoxLayout, QLabel, QLineEdit, QMenu, QMenuBar, QPushButton, QRadioButton, QTextBrowser, QTextEdit, QVBoxLayout, \
-    QWidget
-
-from milk.cmm import Cmm
-from milk.conf import Lang, LangUI, signals, StyleSheet
+import win32api
+import win32con
+from win32gui import SystemParametersInfo
 
 try:
     from collections import Iterable
 except (AttributeError, ImportError):
     from collections.abc import Iterable
+
+from PyQt5.QtCore import QSize, Qt
+from PyQt5.QtGui import QFont, QIcon
+from PyQt5.QtWidgets import QAction, QApplication, QButtonGroup, QComboBox, QFileDialog, QGridLayout, QGroupBox, \
+    QHBoxLayout, QLabel, QLineEdit, QMenu, QMenuBar, QProgressBar, QPushButton, QRadioButton, QTextBrowser, QTextEdit, \
+    QVBoxLayout, QWidget
+
+from milk.cmm import Cmm
+from milk.conf import Lang, LangUI, ResMap, signals, StyleSheet
 
 
 class GUI:
@@ -145,12 +151,27 @@ class GUI:
         return lab
 
     @staticmethod
-    def create_line_edit(text: str, readonly: bool = False):
+    def create_line_edit(text: str, readonly: bool = False, placeholder: str = ''):
         edit = QLineEdit(text)
         edit.setFont(GUI.font())
         edit.setReadOnly(readonly)
         edit.setCursorPosition(0)
+        if len(placeholder) > 0:
+            edit.setPlaceholderText(placeholder)
         return edit
+
+    @staticmethod
+    def set_folder_action_for_line_edit(edit: QLineEdit):
+        icon = GUI.icon(ResMap.img_folder_open)
+        pos = QLineEdit.TrailingPosition
+        edit.addAction(icon, pos)
+        return edit.actions()[-1]
+
+    @staticmethod
+    def create_progress_bar():
+        bar = QProgressBar()
+        bar.setFont(GUI.font())
+        return bar
 
     @staticmethod
     def create_icon_btn(path: str, checkable: bool = False):
@@ -259,5 +280,31 @@ class GUI:
         if exists(chosen) and isdir(chosen):
             return chosen
         return None
+
+    # noinspection PyBroadException
+    @staticmethod
+    def get_screensize(multiplier=1):
+        try:
+            user32 = ctypes.windll.user32
+            screensize = (user32.GetSystemMetrics(78) * multiplier, user32.GetSystemMetrics(79) * multiplier)
+            print(f"\r[+] Status: Detected virtual monitor size {screensize[0]}x{screensize[1]}.", end="")
+            if multiplier > 1:
+                print(f"\r[+] Status: Multiplying to {screensize} for better quality.", end="")
+            return screensize
+        except:
+            print(f"\r[-] Status: Encountered some problems while detecting your display size.", end="")
+            print_exc()
+
+    # noinspection PyBroadException
+    @staticmethod
+    def set_wallpaper(path):
+        def on_start():
+            key = win32api.RegOpenKeyEx(win32con.HKEY_CURRENT_USER, "Control Panel\\Desktop", 0, win32con.KEY_SET_VALUE)
+            win32api.RegSetValueEx(key, "WallpaperStyle", 0, win32con.REG_SZ, "10")
+            win32api.RegSetValueEx(key, "TileWallpaper", 0, win32con.REG_SZ, "0")
+            SystemParametersInfo(win32con.SPI_SETDESKWALLPAPER, abspath(path), win32con.SPIF_SENDWININICHANGE)
+            win32api.RegCloseKey(key)
+
+        Cmm.trace(on_start)
 
     # region end - staticmethod

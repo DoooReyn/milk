@@ -91,6 +91,7 @@ class LangUI:
     main_ui_btn_error = "Error"
     main_ui_btn_fatal = "Fatal"
 
+    wallpaper_title = "随机壁纸"
     wallpaper_ui_lab_public_key = "Access Key"
     wallpaper_ui_public_key = "请输入 unsplash 公钥"
     wallpaper_ui_lab_private_key = "Secret Key"
@@ -102,7 +103,9 @@ class LangUI:
     wallpaper_ui_btn_save = "选择保存目录"
     wallpaper_ui_btn_random = "随机壁纸"
     wallpaper_ui_btn_download = "设为壁纸"
+    wallpaper_ui_btn_dislike = "不喜欢"
     wallpaper_ui_msg_title = "下载文件"
+    wallpaper_downloading = "正在下载壁纸: {0}"
 
     atlas_extractor_ui_edit_atlas_dir = "请选择 Spine Atlas 所在目录"
     atlas_extractor_ui_edit_out_dir = "请选择碎图输出目录"
