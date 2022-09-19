@@ -6,9 +6,9 @@ from milk.gui import GUI
 from milk.view.about_me.about_me_view import AboutMeView
 from milk.view.main.main_view import MainView
 from milk.view.spine.spine_atlas_extractor import SpineAtlasExtractor
-from milk.view.texture.texture_unpacker import TextureUnpacker
+from milk.view.texture.unpacker_view import UnpackerView
 from milk.view.translate.translate_view import TranslateView
-from milk.view.wallpaper.wallpaper import UnsplashWallPaper
+from milk.view.wallpaper.wallpaper_view import WallPaperView
 from milk.view.weread.weread import WeRead
 
 
@@ -100,13 +100,13 @@ class Window(QMainWindow):
         pass
 
     def on_menu_image_texture_unpacker(self):
-        self.open_menu(UIDef.ImageTextureUnpacker, TextureUnpacker)
+        self.open_menu(UIDef.ImageTextureUnpacker, UnpackerView)
 
     def on_menu_image_spine_atlas_extractor(self):
         self.open_menu(UIDef.ImageSpineAtlasExtractor, SpineAtlasExtractor)
 
     def on_menu_tools_random_wallpaper(self):
-        self.open_menu(UIDef.ToolsWallpaper, UnsplashWallPaper)
+        self.open_menu(UIDef.ToolsWallpaper, WallPaperView)
 
     @staticmethod
     def open_api_document(url: str):

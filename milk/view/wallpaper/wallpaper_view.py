@@ -9,6 +9,7 @@ from PyQt5.QtWidgets import QMessageBox, QWidget
 from unsplash.api import Api
 from unsplash.auth import Auth
 
+from conf import UIDef
 from milk.cmm import Cmm
 from milk.conf import LangUI, settings, signals, UserKey
 from milk.gui import GUI
@@ -72,9 +73,9 @@ class _View(UIBase):
         GUI.set_grid_span(self.ui_layout, [], [4, 5])
 
 
-class UnsplashWallPaper(_View):
+class WallPaperView(_View):
     def __init__(self, parent: QWidget = None):
-        super(UnsplashWallPaper, self).__init__(parent)
+        super(WallPaperView, self).__init__(parent)
 
         self.screen_width, self.screen_height = GUI.get_screensize()
         self.network_manager = QNetworkAccessManager()
@@ -83,6 +84,7 @@ class UnsplashWallPaper(_View):
         self.temp_file_handler: Optional[QFile] = None
         self.file_link: Optional[QUrl] = None
         self.setWindowTitle(LangUI.wallpaper_title)
+        self.setup_window_code(UIDef.ToolsWallpaper.value)
         self.setMinimumSize(500, 184)
         self.setup_ui_signals()
         self.setup_preferences()

@@ -1,6 +1,7 @@
 import ctypes
 from os.path import abspath, exists, isdir, isfile
 from traceback import print_exc
+from typing import Union
 
 import win32api
 import win32con
@@ -14,7 +15,8 @@ except (AttributeError, ImportError):
 from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtGui import QFont, QIcon
 from PyQt5.QtWidgets import QAction, QApplication, QButtonGroup, QComboBox, QFileDialog, QGridLayout, QGroupBox, \
-    QHBoxLayout, QLabel, QLineEdit, QMenu, QMenuBar, QProgressBar, QPushButton, QRadioButton, QTextBrowser, QTextEdit, \
+    QHBoxLayout, QLabel, QLineEdit, QListWidget, QMenu, QMenuBar, QProgressBar, QPushButton, QRadioButton, QTextBrowser, \
+    QTextEdit, \
     QVBoxLayout, QWidget
 
 from milk.cmm import Cmm
@@ -306,5 +308,13 @@ class GUI:
             win32api.RegCloseKey(key)
 
         Cmm.trace(on_start)
+
+    @staticmethod
+    def create_list_widget():
+        return QListWidget()
+
+    @staticmethod
+    def hv_layout_widgets(layout: Union[QHBoxLayout, QVBoxLayout], widgets: Iterable[QWidget]):
+        [layout.addWidget(w) for w in widgets]
 
     # region end - staticmethod
