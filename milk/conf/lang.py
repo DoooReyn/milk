@@ -115,7 +115,7 @@ class LangUI:
     atlas_extractor_ui_lab_output_dir = '输出目录'
     atlas_extractor_ui_edit_locate_dir = "请选择 Spine Atlas 所在目录"
     atlas_extractor_ui_edit_output_dir = "请选择碎图输出目录"
-    atlas_extractor_ui_btn_parse = "解析"
+    atlas_extractor_ui_btn_parse = "提取"
 
     texture_unpacker_title = "Plist 合图提取器"
     texture_unpacker_ui_tip = "请在此处拖入 .png/.plist 文件"

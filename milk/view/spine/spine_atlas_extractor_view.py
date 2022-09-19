@@ -42,7 +42,7 @@ class _View(GUI.View):
                 GUI.GridItem(self.ui_edit_atlas_output_dir, 1, 2),
             ]),
             (2, [
-                GUI.GridItem(self.ui_btn_parse, 1, 1),
+                GUI.GridItem(self.ui_btn_parse, 0, 3),
             ])
         ])
         GUI.set_grid_span(self.ui_layout, [], [2])
