@@ -35,9 +35,9 @@ class _View(UIBase):
         self.ui_layout.setMenuBar(GUI.create_menu_bar(UnpackerMenus, self))
 
 
-class UnpackerView(_View):
+class TextureUnpackerView(_View):
     def __init__(self):
-        super(UnpackerView, self).__init__()
+        super(TextureUnpackerView, self).__init__()
 
         self.plist_data: Optional[dict] = None
         self.setWindowTitle(LangUI.texture_unpacker_title)

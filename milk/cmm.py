@@ -1,4 +1,3 @@
-
 import random
 import sys
 from os import listdir, makedirs
@@ -128,19 +127,15 @@ class MsgBox:
 
     @staticmethod
     def msg(msg_text: str, title: str = "Tips", detail: str = "", ico=QMessageBox.Information):
-        return MsgBox.makeBox(msg_text, title, detail, ico, QMessageBox.Ok)
+        return MsgBox.makeBox(msg_text, title, detail, ico)
 
     # noinspection PyBroadException
     @staticmethod
     def makeBox(msg_text: str, title: str = "", detail: str = "", ico=QMessageBox.Information, style=QMessageBox.Ok):
-        def on_start():
-            msg = QMessageBox()
-            msg.setIcon(ico)
-            msg.setText(msg_text)
-            msg.setWindowTitle(title)
-            msg.setDetailedText(detail)
-            msg.setStandardButtons(style)
-            ret = msg.exec_()
-            return ret
-
-        return Cmm.trace(on_start)
+        msg = QMessageBox()
+        msg.setIcon(ico)
+        msg.setText(msg_text)
+        msg.setWindowTitle(title)
+        msg.setDetailedText(detail)
+        msg.setStandardButtons(style)
+        return msg.exec_()
