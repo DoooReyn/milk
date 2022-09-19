@@ -10,19 +10,18 @@ from PyQt5.QtCore import QStandardPaths, QUrl
 from PyQt5.QtGui import QColor, QDesktopServices
 
 
-class StoppableThread(Thread):
-    def __init__(self, **kwargs):
-        super(StoppableThread, self).__init__(**kwargs)
-        self._stop_event = Event()
-
-    def stop(self):
-        self._stop_event.set()
-
-    def stopped(self):
-        return self._stop_event.is_set()
-
-
 class Cmm:
+    class StoppableThread(Thread):
+        def __init__(self, **kwargs):
+            super(Cmm.StoppableThread, self).__init__(**kwargs)
+            self._stop_event = Event()
+
+        def stop(self):
+            self._stop_event.set()
+
+        def stopped(self):
+            return self._stop_event.is_set()
+
     # noinspection PyBroadException
     @staticmethod
     def trace(on_start, on_error=None, on_final=None):

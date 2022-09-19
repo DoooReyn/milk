@@ -7,7 +7,7 @@ from time import sleep
 from PIL import Image
 from PyQt5.QtCore import Qt
 
-from milk.cmm import Cmm, StoppableThread
+from milk.cmm import Cmm
 from milk.conf import LangUI, settings, signals, UIDef, UserKey
 from milk.gui import GUI
 
@@ -142,7 +142,7 @@ class SpineAtlasExtractorView(_View):
                 signals.logger_info.emit(LangUI.msg_all_extracted.format(locate))
                 signals.window_switch_to_main.emit()
 
-            self.thread = StoppableThread(target=_run)
+            self.thread = Cmm.StoppableThread(target=_run)
             self.thread.daemon = True
             self.thread.start()
 
