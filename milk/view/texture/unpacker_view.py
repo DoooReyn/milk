@@ -7,13 +7,12 @@ from PyQt5.QtCore import QRectF, Qt
 from PyQt5.QtWidgets import QAction, QListWidgetItem, QMenu
 
 from milk.cmm import Cmm
-from milk.conf import LangUI
-from milk.conf import settings, signals, UIDef, UserKey
+from milk.conf import LangUI, settings, signals, UIDef, UserKey
 from milk.gui import GUI
-from milk.view.texture.graphics_canvas import DroppableGraphicsScene, ResizableGraphicsView
-from milk.view.texture.plist_parser import PlistParser
-from milk.view.texture.conf import UnpackerMenus
 from milk.view.ui_base import UIBase
+from .conf import UnpackerMenus
+from .graphics_canvas import DroppableGraphicsScene, ResizableGraphicsView
+from .plist_parser import PlistParser
 
 
 class _View(UIBase):
