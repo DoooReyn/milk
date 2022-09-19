@@ -5,7 +5,7 @@ from milk.conf import LangUI, Settings, signals, UIDef
 from milk.gui import GUI
 from milk.view.about_me.about_me_view import AboutMeView
 from milk.view.main.main_view import MainView
-from milk.view.spine.spine_atlas_extractor import SpineAtlasExtractor
+from milk.view.spine.spine_atlas_extractor_view import SpineAtlasExtractorView
 from milk.view.texture.unpacker_view import TextureUnpackerView
 from milk.view.translate.translate_view import TranslateView
 from milk.view.wallpaper.wallpaper_view import WallPaperView
@@ -103,7 +103,7 @@ class Window(QMainWindow):
         self.open_menu(UIDef.ImageTextureUnpacker, TextureUnpackerView)
 
     def on_menu_image_spine_atlas_extractor(self):
-        self.open_menu(UIDef.ImageSpineAtlasExtractor, SpineAtlasExtractor)
+        self.open_menu(UIDef.ImageSpineAtlasExtractor, SpineAtlasExtractorView)
 
     def on_menu_tools_random_wallpaper(self):
         self.open_menu(UIDef.ToolsWallpaper, WallPaperView)

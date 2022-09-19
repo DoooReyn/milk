@@ -101,7 +101,7 @@ class GUI:
         combo = QComboBox()
 
         combo.setEditable(False)
-        line_edit = GUI.create_line_edit('', True)
+        line_edit = GUI.create_line_edit(readonly=True)
         line_edit.selectionChanged.connect(lambda: line_edit.deselect())
         line_edit.setAlignment(Qt.AlignCenter)
         combo.setLineEdit(line_edit)
@@ -118,7 +118,7 @@ class GUI:
     @staticmethod
     def init_combo_box(combo: QComboBox):
         combo.setEditable(False)
-        line_edit = GUI.create_line_edit('', True)
+        line_edit = GUI.create_line_edit(readonly=True)
         line_edit.selectionChanged.connect(lambda: line_edit.deselect())
         line_edit.setAlignment(Qt.AlignCenter)
         combo.setLineEdit(line_edit)
@@ -153,7 +153,7 @@ class GUI:
         return lab
 
     @staticmethod
-    def create_line_edit(text: str, readonly: bool = False, placeholder: str = ''):
+    def create_line_edit(text: str = '', readonly: bool = False, placeholder: str = ''):
         edit = QLineEdit(text)
         edit.setFont(GUI.font())
         edit.setReadOnly(readonly)

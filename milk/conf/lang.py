@@ -110,6 +110,7 @@ class LangUI:
     wallpaper_ui_msg_title = "下载文件"
     wallpaper_downloading = "正在下载壁纸: {0}"
 
+    atlas_extractor_title = 'Spine Atlas 提取器'
     atlas_extractor_ui_edit_atlas_dir = "请选择 Spine Atlas 所在目录"
     atlas_extractor_ui_edit_out_dir = "请选择碎图输出目录"
     atlas_extractor_ui_btn_choose = "选择"
