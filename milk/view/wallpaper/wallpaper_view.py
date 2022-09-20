@@ -1,5 +1,5 @@
-from os.path import exists, join
 from os import remove
+from os.path import exists, join
 from typing import Optional
 
 from PyQt5.QtCore import QFile, QFileInfo, QIODevice, Qt, QUrl
@@ -42,33 +42,33 @@ class _View(GUI.View):
         # layout widgets
         self.ui_layout = GUI.create_grid_layout(self)
         self.ui_layout.setAlignment(Qt.AlignTop)
-        GUI.add_grid_in_rows(self.ui_layout, [
-            (0, [
+        GUI.add_grid_in_rows(self.ui_layout, (
+            (
                 GUI.GridItem(self.ui_lab_public_key, 0, 1),
                 GUI.GridItem(self.ui_edit_public_key, 1, 5)
-            ]),
-            (1, [
+            ),
+            (
                 GUI.GridItem(self.ui_lab_private_key, 0, 1),
                 GUI.GridItem(self.ui_edit_private_key, 1, 5)
-            ]),
-            (2, [
+            ),
+            (
                 GUI.GridItem(self.ui_lab_redirect_uri, 0, 1),
                 GUI.GridItem(self.ui_edit_redirect_uri, 1, 5)
-            ]),
-            (3, [
+            ),
+            (
                 GUI.GridItem(self.ui_lab_save_at, 0, 1),
                 GUI.GridItem(self.ui_edit_save_at, 1, 5)
-            ]),
-            (4, [
+            ),
+            (
                 GUI.GridItem(self.ui_btn_random, 0, 1),
                 GUI.GridItem(self.ui_btn_setup, 1, 1),
                 GUI.GridItem(self.ui_btn_dislike, 2, 1),
                 GUI.GridItem(self.ui_progress_bar, 3, 5),
-            ]),
-            (5, [
+            ),
+            (
                 GUI.GridItem(self.ui_pixmap, 0, 6),
-            ]),
-        ])
+            ),
+        ))
         GUI.set_grid_span(self.ui_layout, [], [4, 5])
 
 

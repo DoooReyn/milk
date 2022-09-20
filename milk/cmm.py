@@ -6,11 +6,19 @@ from shutil import rmtree
 from threading import Event, Thread
 from traceback import format_exc, print_exc
 
+import cchardet
 from PyQt5.QtCore import QStandardPaths, QUrl
 from PyQt5.QtGui import QColor, QDesktopServices
 
+try:
+    from collections import Iterable
+except (AttributeError, ImportError):
+    from collections.abc import Iterable
+
 
 class Cmm:
+    Iterable = Iterable
+
     class StoppableThread(Thread):
         def __init__(self, **kwargs):
             super(Cmm.StoppableThread, self).__init__(**kwargs)
@@ -116,3 +124,38 @@ class Cmm:
     @staticmethod
     def random_color(alpha: int = 255):
         return QColor(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255), alpha)
+
+    @staticmethod
+    def get_file_encoding(filepath: str):
+        with open(filepath, 'rb') as f:
+            encoding = cchardet.detect(f.read())['encoding'].lower()
+            return Cmm.format_file_encoding(encoding)
+
+    @staticmethod
+    def format_file_encoding(encoding: str):
+        encoding = encoding.lower()
+        if encoding in ["iso-8859-1", "ascii"]:
+            return "utf-8"
+        elif encoding == "euc-tw":
+            return "gbk"
+        return encoding
+
+    @staticmethod
+    def convert_file_encoding_to_utf8(filepath: str):
+        with open(filepath, 'rb+') as f:
+            content = f.read()
+            encoding = cchardet.detect(content)['encoding']
+            result = Cmm.format_file_encoding(encoding)
+            try:
+                if result != 'utf-8':
+                    content = content.decode(encoding).encode('utf8')
+                    f.seek(0)
+                    f.write(content)
+                return result, True
+            except (UnicodeDecodeError, UnicodeEncodeError) as e:
+                print(e)
+                return result, False
+
+    @staticmethod
+    def is_utf8_file(filepath: str):
+        return Cmm.get_file_encoding(filepath) in ['utf-8', 'utf8']

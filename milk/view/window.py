@@ -4,6 +4,7 @@ from milk.cmm import Cmm
 from milk.conf import LangUI, Settings, signals, UIDef
 from milk.gui import GUI
 from milk.view.about_me.about_me_view import AboutMeView
+from milk.view.lua.encoding_detection_view import EncodingDetectionView
 from milk.view.main.main_view import MainView
 from milk.view.spine.spine_atlas_extractor_view import SpineAtlasExtractorView
 from milk.view.texture.unpacker_view import TextureUnpackerView
@@ -153,6 +154,9 @@ class Window(QMainWindow):
     @staticmethod
     def on_menu_doc_go():
         Window.open_api_document("https://go.dev/doc/")
+
+    def on_menu_lua_encoding(self):
+        self.open_menu(UIDef.LuaEncodingChecker, EncodingDetectionView)
 
     def closeEvent(self, evt):
         for key, win in self.windows.items():

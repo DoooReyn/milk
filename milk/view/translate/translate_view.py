@@ -30,7 +30,7 @@ class _View(GUI.View):
         self.ui_lab_fasttext = GUI.create_label('FastText')
         self.ui_edit_fasttext = GUI.create_line_edit(self.fasttext_at(), True)
 
-        self.ui_combo_source = GUI.create_combo_box(TRANSLATE_LANGUAGE_ITEMS, 0)
+        self.ui_combo_source = GUI.create_combo_box(TRANSLATE_LANGUAGE_ITEMS)
         self.ui_combo_target = GUI.create_combo_box(TRANSLATE_LANGUAGE_ITEMS, 1)
         self.ui_icon_switch = GUI.create_icon_btn(ResMap.img_switch)
         self.ui_radio_box, self.ui_radio_group = GUI.create_radio_group(LangUI.translate_quality,
@@ -46,36 +46,36 @@ class _View(GUI.View):
 
         # layout widgets
         self.ui_layout = GUI.create_grid_layout(self)
-        GUI.add_grid_in_rows(self.ui_layout, [
-            (0, [
+        GUI.add_grid_in_rows(self.ui_layout, (
+            (
                 GUI.GridItem(self.ui_lab_ctranslate, 0, 1),
-                GUI.GridItem(self.ui_edit_ctranslate, 1, 5)
-            ]),
-            (1, [
+                GUI.GridItem(self.ui_edit_ctranslate, 1, 5),
+            ),
+            (
                 GUI.GridItem(self.ui_lab_sentence, 0, 1),
-                GUI.GridItem(self.ui_edit_sentence, 1, 5)
-            ]),
-            (3, [
+                GUI.GridItem(self.ui_edit_sentence, 1, 5),
+            ),
+            (
                 GUI.GridItem(self.ui_lab_fasttext, 0, 1),
-                GUI.GridItem(self.ui_edit_fasttext, 1, 5)
-            ]),
-            (4, [
-                GUI.GridItem(self.ui_edit_source, 0, 6)
-            ]),
-            (5, [
+                GUI.GridItem(self.ui_edit_fasttext, 1, 5),
+            ),
+            (
+                GUI.GridItem(self.ui_edit_source, 0, 6),
+            ),
+            (
                 GUI.GridItem(self.ui_combo_source, 0, 1),
                 GUI.GridItem(self.ui_icon_switch, 1, 1),
                 GUI.GridItem(self.ui_combo_target, 2, 1),
-                GUI.GridItem(self.ui_radio_box, 3, 1)
-            ]),
-            (6, [
+                GUI.GridItem(self.ui_radio_box, 3, 1),
+            ),
+            (
                 GUI.GridItem(self.ui_btn_translate, 0, 1),
-                GUI.GridItem(self.ui_btn_copy, 5, 1)
-            ]),
-            (7, [
-                GUI.GridItem(self.ui_edit_target, 0, 6)
-            ])
-        ])
+                GUI.GridItem(self.ui_btn_copy, 5, 1),
+            ),
+            (
+                GUI.GridItem(self.ui_edit_target, 0, 6),
+            ),
+        ))
         GUI.set_grid_span(self.ui_layout, rows=[4, 7], cols=[4])
 
         # menu bar

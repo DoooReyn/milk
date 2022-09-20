@@ -32,19 +32,19 @@ class _View(GUI.View):
         # layout widget
         self.ui_layout = GUI.create_grid_layout(self)
         self.ui_layout.setAlignment(Qt.AlignTop)
-        GUI.add_grid_in_rows(self.ui_layout, [
-            (0, [
+        GUI.add_grid_in_rows(self.ui_layout, (
+            (
                 GUI.GridItem(self.ui_lab_locate_dir, 0, 1),
                 GUI.GridItem(self.ui_edit_atlas_locate_dir, 1, 2),
-            ]),
-            (1, [
+            ),
+            (
                 GUI.GridItem(self.ui_lab_output_dir, 0, 1),
                 GUI.GridItem(self.ui_edit_atlas_output_dir, 1, 2),
-            ]),
-            (2, [
+            ),
+            (
                 GUI.GridItem(self.ui_btn_parse, 0, 3),
-            ])
-        ])
+            )
+        ))
         GUI.set_grid_span(self.ui_layout, [], [2])
 
 

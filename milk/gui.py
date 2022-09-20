@@ -7,11 +7,6 @@ import win32api
 import win32con
 from win32gui import SystemParametersInfo
 
-try:
-    from collections import Iterable
-except (AttributeError, ImportError):
-    from collections.abc import Iterable
-
 from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtGui import QFont, QIcon
 from PyQt5.QtWidgets import QAction, QApplication, QButtonGroup, QComboBox, QFileDialog, QGridLayout, QGroupBox, \
@@ -131,7 +126,7 @@ class GUI:
         signals.logger_warn.emit(LangUI.msg_not_implemented.format(menu, name))
 
     @staticmethod
-    def create_combo_box(items: tuple[str], default_index: int = 0):
+    def create_combo_box(items: Cmm.Iterable[str], default_index: int = 0):
         combo = QComboBox()
 
         combo.setEditable(False)
@@ -279,17 +274,17 @@ class GUI:
         return browser
 
     @staticmethod
-    def add_grid_in_row(layout: QGridLayout, row: int, items: Iterable[GridItem]):
+    def add_grid_in_row(layout: QGridLayout, row: int, items: Cmm.Iterable[GridItem]):
         for item in items:
             layout.addWidget(item.widget, row, item.start, 1, item.col_span)
 
     @staticmethod
-    def add_grid_in_rows(layout: QGridLayout, rows: Iterable[(int, Iterable[GridItem])]):
-        for row, items in rows:
+    def add_grid_in_rows(layout: QGridLayout, rows: Cmm.Iterable[Cmm.Iterable[GridItem]]):
+        for row, items in enumerate(rows):
             GUI.add_grid_in_row(layout, row, items)
 
     @staticmethod
-    def set_grid_span(layout: QGridLayout, rows: Iterable[int], cols: Iterable[int]):
+    def set_grid_span(layout: QGridLayout, rows: Cmm.Iterable[int], cols: Cmm.Iterable[int]):
         for row in rows:
             layout.setRowStretch(row, 1)
         for col in cols:
@@ -348,7 +343,7 @@ class GUI:
         return QListWidget()
 
     @staticmethod
-    def hv_layout_widgets(layout: Union[QHBoxLayout, QVBoxLayout], widgets: Iterable[QWidget]):
+    def hv_layout_widgets(layout: Union[QHBoxLayout, QVBoxLayout], widgets: Cmm.Iterable[QWidget]):
         [layout.addWidget(w) for w in widgets]
 
     # region end - staticmethod
