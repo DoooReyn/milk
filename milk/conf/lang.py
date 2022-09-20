@@ -155,6 +155,7 @@ class LangUI:
     lua_encoding_detection_folder_selection = "选取目录"
     lua_encoding_detection_extension_specify = "指定扩展名"
     lua_encoding_detection_convert_to_utf8 = "转换为 UTF-8"
+    lua_encoding_detection_non_utf8_only = "non UTF-8 only"
     lua_encoding_detection_file_not_found = "{} 不存在"
     lua_encoding_detection_convert_ok = "<成功>"
     lua_encoding_detection_convert_bad = "<失败>"

@@ -1,8 +1,8 @@
-import random
-import sys
-from os import listdir, makedirs
+from os import listdir, makedirs, sep
 from os.path import dirname, isdir, join, realpath, splitext
+from random import randint
 from shutil import rmtree
+from sys import executable
 from threading import Event, Thread
 from traceback import format_exc, print_exc
 
@@ -45,11 +45,11 @@ class Cmm:
 
     @staticmethod
     def is_debug_mode():
-        return sys.executable.endswith("python.exe")
+        return executable.endswith("python.exe")
 
     @staticmethod
     def app_running_dir():
-        return realpath(join(dirname(__file__), '..')) if Cmm.is_debug_mode else realpath(dirname(sys.executable))
+        return realpath(join(dirname(__file__), '..')) if Cmm.is_debug_mode else realpath(dirname(executable))
 
     @staticmethod
     def local_cache_dir():
@@ -123,12 +123,13 @@ class Cmm:
 
     @staticmethod
     def random_color(alpha: int = 255):
-        return QColor(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255), alpha)
+        return QColor(randint(0, 255), randint(0, 255), randint(0, 255), alpha)
 
     @staticmethod
     def get_file_encoding(filepath: str):
         with open(filepath, 'rb') as f:
-            encoding = cchardet.detect(f.read())['encoding'].lower()
+            encoding = cchardet.detect(f.read())['encoding']
+            encoding = 'utf-8' if encoding is None else encoding.lower()
             return Cmm.format_file_encoding(encoding)
 
     @staticmethod
@@ -158,4 +159,17 @@ class Cmm:
 
     @staticmethod
     def is_utf8_file(filepath: str):
-        return Cmm.get_file_encoding(filepath) in ['utf-8', 'utf8']
+        return Cmm.is_utf8_encoding(Cmm.get_file_encoding(filepath))
+
+    @staticmethod
+    def is_utf8_encoding(encoding: str):
+        return encoding in ['utf-8', 'utf8']
+
+    @staticmethod
+    def is_hiding_path(path: str):
+        starts_with_dot = False
+        for item in path.split(sep):
+            if item.startswith('.'):
+                starts_with_dot = True
+                break
+        return starts_with_dot

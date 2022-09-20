@@ -34,4 +34,10 @@
   
     ![](screenshot/OfflineTranslator.png)
 
-- ✔ 多应用在线文档链接跳转
+- ✔ 在线文档
+
+  ![](screenshot/API-Document.png)
+
+- ✔ 文件编码检测与转换工具
+
+  ![](screenshot/EncodingDetection.png)

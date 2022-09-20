@@ -9,7 +9,8 @@ from win32gui import SystemParametersInfo
 
 from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtGui import QFont, QIcon
-from PyQt5.QtWidgets import QAction, QApplication, QButtonGroup, QComboBox, QFileDialog, QGridLayout, QGroupBox, \
+from PyQt5.QtWidgets import QAction, QApplication, QButtonGroup, QCheckBox, QComboBox, QFileDialog, QGridLayout, \
+    QGroupBox, \
     QHBoxLayout, QLabel, QLineEdit, QListWidget, QMenu, QMenuBar, QMessageBox, QProgressBar, QPushButton, QRadioButton, \
     QTextBrowser, \
     QTextEdit, \
@@ -218,6 +219,12 @@ class GUI:
         return radio
 
     @staticmethod
+    def create_check_box(text: str):
+        box = QCheckBox(text)
+        box.setFont(GUI.font())
+        return box
+
+    @staticmethod
     def create_radio_group(title: str, items: tuple[str], ids: tuple[int], default_id: int):
         box = QGroupBox()
 
@@ -272,6 +279,10 @@ class GUI:
         browser.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         browser.setMarkdown(markdown)
         return browser
+
+    @staticmethod
+    def set_text_browser_selectable(tb: QTextBrowser, ok: bool):
+        tb.setTextInteractionFlags(Qt.TextBrowserInteraction if ok else Qt.NoTextInteraction)
 
     @staticmethod
     def add_grid_in_row(layout: QGridLayout, row: int, items: Cmm.Iterable[GridItem]):
