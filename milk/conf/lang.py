@@ -150,3 +150,11 @@ class LangUI:
     translate_unsupported_language = '不支持的目标语言: {}'
     translate_input_content = '请输入需要翻译的内容'
     translate_convert_failed = '<b style="color:red;">翻译失败</b>'
+
+    lua_encoding_detection_title = "文件编码检测"
+    lua_encoding_detection_folder_selection = "选取目录"
+    lua_encoding_detection_extension_specify = "指定扩展名"
+    lua_encoding_detection_convert_to_utf8 = "转换为 UTF-8"
+    lua_encoding_detection_file_not_found = "{} 不存在"
+    lua_encoding_detection_convert_ok = "<成功>"
+    lua_encoding_detection_convert_bad = "<失败>"

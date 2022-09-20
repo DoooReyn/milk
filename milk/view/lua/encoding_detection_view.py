@@ -4,9 +4,8 @@ from os.path import exists, isdir, isfile, join, normpath, splitext
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QColor
 
-from conf import settings
 from milk.cmm import Cmm
-from milk.conf import UIDef
+from milk.conf import LangUI, settings, UIDef
 from milk.gui import GUI
 
 
@@ -15,12 +14,12 @@ class _View(GUI.View):
         super(_View, self).__init__()
 
         # create widgets
-        self.ui_lab_choose = GUI.create_label('选取目录')
-        self.ui_edit_choose = GUI.create_line_edit(placeholder="选取目录")
+        self.ui_lab_choose = GUI.create_label(LangUI.lua_encoding_detection_folder_selection)
+        self.ui_edit_choose = GUI.create_line_edit(placeholder=LangUI.lua_encoding_detection_folder_selection)
         self.ui_act_choose = GUI.set_folder_action_for_line_edit(self.ui_edit_choose)
-        self.ui_lab_only = GUI.create_label('指定扩展名')
+        self.ui_lab_only = GUI.create_label(LangUI.lua_encoding_detection_extension_specify)
         self.ui_edit_only = GUI.create_line_edit(placeholder=".lua,.py,.js,...")
-        self.ui_radio_convert = GUI.create_radio_btn('转换为 UTF-8')
+        self.ui_radio_convert = GUI.create_radio_btn(LangUI.lua_encoding_detection_convert_to_utf8)
         self.ui_tb_log = GUI.create_text_browser()
         self.ui_tb_log.setTextInteractionFlags(Qt.TextBrowserInteraction)
         self.ui_tb_log.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
@@ -50,7 +49,7 @@ class EncodingDetectionView(_View):
 
         self.colors = [QColor('#ff6b81'), QColor('#6bddcd'), ]
         self.color_index = 0
-        self.setWindowTitle("文件编码检测")
+        self.setWindowTitle(LangUI.lua_encoding_detection_title)
         self.setMinimumSize(400, 400)
         self.resize(600, 400)
         self.setup_window_code(UIDef.LuaEncodingChecker.value)
@@ -103,9 +102,9 @@ class EncodingDetectionView(_View):
                 encoding, converted = Cmm.convert_file_encoding_to_utf8(where)
                 result = "[ {} ] {} ".format(encoding, normpath(where))
                 if converted:
-                    self.ok(result + '<成功>')
+                    self.ok(result + LangUI.lua_encoding_detection_convert_ok)
                 else:
-                    self.bad(result + '<失败>')
+                    self.bad(result + LangUI.lua_encoding_detection_convert_bad)
             else:
                 encoding = Cmm.get_file_encoding(where)
                 result = "[ {} ] {} ".format(encoding, normpath(where))
@@ -142,10 +141,11 @@ class EncodingDetectionView(_View):
         elif isfile(where):
             self._detect_encoding(where)
         else:
-            self.bad("{} 不存在".format(normpath(where)))
+            self.bad(LangUI.lua_encoding_detection_file_not_found.format(normpath(where)))
 
     def on_choose_files(self):
-        chosen = GUI.dialog_for_directory_selection(self, "选取文件或目录", self.last_at())
+        title = LangUI.lua_encoding_detection_folder_selection
+        chosen = GUI.dialog_for_directory_selection(self, title, self.last_at())
         if chosen is not None:
             self.ui_edit_choose.setText(chosen)
             self.last_at(chosen)
