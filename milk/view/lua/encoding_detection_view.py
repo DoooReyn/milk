@@ -7,7 +7,7 @@ from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QTextEdit
 
 from milk.cmm import Cmm
-from milk.conf import LangUI, settings, StyleSheet, UIDef
+from milk.conf import LangUI, settings, StyleSheet, UIDef, UserKey
 from milk.gui import GUI
 
 
@@ -76,9 +76,9 @@ class EncodingDetectionView(_View):
     @staticmethod
     def last_at(at: str = None):
         if at is not None:
-            settings.setValue('lua:encoding_detection:last_dir', at)
+            settings.setValue(UserKey.LuaEncodingDetection.last_dir, at)
         else:
-            return settings.value('lua:encoding_detection:last_dir', Cmm.user_document_dir(), str)
+            return settings.value(UserKey.LuaEncodingDetection.last_dir, Cmm.user_document_dir(), str)
 
     def set_widgets_enabled(self, ok: bool):
         GUI.set_text_browser_selectable(self.ui_tb_log, ok)
@@ -137,6 +137,7 @@ class EncodingDetectionView(_View):
 
             if self.thread:
                 self.thread.stop()
+                self.thread = None
 
             self.set_widgets_enabled(True)
 
@@ -145,7 +146,7 @@ class EncodingDetectionView(_View):
         self.thread.start()
 
     def closeEvent(self, event):
-        if self.thread:
+        if self.thread is not None:
             self.thread.stop()
         super(EncodingDetectionView, self).closeEvent(event)
 

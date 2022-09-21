@@ -1,5 +1,7 @@
+from os import makedirs, path
+
 from PyQt5.QtCore import QSettings, QStandardPaths
-from os import path, makedirs
+
 from .res_map import ResMap
 
 
@@ -265,10 +267,10 @@ class Settings:
 
 class UserKey:
     class Wallpaper:
-        public_key = "public_key"
-        private_key = "private_key"
-        redirect_uri = "redirect_uri"
-        save_at = "save_at"
+        public_key = "tools:wallpaper:public_key"
+        private_key = "tools:wallpaper:private_key"
+        redirect_uri = "tools:wallpaper:redirect_uri"
+        save_at = "tools:wallpaper:save_at"
 
     class Main:
         log_trace = "log_trace"
@@ -279,16 +281,32 @@ class UserKey:
         log_fatal = "log_fatal"
 
     class SpineAtlasExtractor:
-        atlas_locate_dir = "atlas_locate_dir"
-        atlas_out_dir = "atlas_out_dir"
+        atlas_locate_dir = "texture:spine:atlas:atlas_locate_dir"
+        atlas_out_dir = "texture:spine:atlas:atlas_out_dir"
+        window_width = "texture:spine:atlas::window_width"
+        window_height = "texture:spine:atlas::window_height"
 
     class TextureUnpacker:
-        last_save_at = "last_save_at"
+        last_save_at = "texture:unpacker:last_save_at"
+        window_width = "texture:unpacker:window_width"
+        window_height = "texture:unpacker:window_height"
 
     class Translator:
-        ctranslate2_model = "ctranslate2_model"
-        sentence_piece_model = "sentence_piece_model"
-        fasttext_model = "fasttext_model"
+        ctranslate2_model = "tools:translator:ctranslate2_model"
+        sentence_piece_model = "tools:translator:sentence_piece_model"
+        fasttext_model = "tools:translator:fasttext_model"
+        window_width = "tools:translator:window_width"
+        window_height = "tools:translator:window_height"
+
+    class LuaEncodingDetection:
+        last_dir = "lua:encoding:last_dir"
+        window_width = "lua:encoding:window_width"
+        window_height = "lua:encoding:window_height"
+
+    class LuaGrammar:
+        folder_at = "lua:grammar:folder_at"
+        window_width = "lua:grammar:window_width"
+        window_height = "lua:grammar:window_height"
 
 
 local_dir = QStandardPaths.writableLocation(QStandardPaths.AppConfigLocation)

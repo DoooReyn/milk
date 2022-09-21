@@ -1,20 +1,18 @@
 import ctypes
 from os.path import abspath, exists, isdir, isfile
 from traceback import print_exc
-from typing import Union
+from typing import List, Union
 
 import win32api
 import win32con
-from win32gui import SystemParametersInfo
-
 from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtGui import QFont, QIcon
-from PyQt5.QtWidgets import QAction, QApplication, QButtonGroup, QCheckBox, QComboBox, QFileDialog, QGridLayout, \
-    QGroupBox, \
-    QHBoxLayout, QLabel, QLineEdit, QListWidget, QMenu, QMenuBar, QMessageBox, QProgressBar, QPushButton, QRadioButton, \
-    QTextBrowser, \
-    QTextEdit, \
-    QVBoxLayout, QWidget
+from PyQt5.QtWidgets import QAbstractItemView, QAction, QApplication, QButtonGroup, QCheckBox, QComboBox, QFileDialog, \
+    QGridLayout, \
+    QGroupBox, QHBoxLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem, QMenu, QMenuBar, QMessageBox, QProgressBar, \
+    QPushButton, \
+    QRadioButton, QTableWidget, QTableWidgetItem, QTextBrowser, QTextEdit, QVBoxLayout, QWidget
+from win32gui import SystemParametersInfo
 
 from milk.cmm import Cmm
 from milk.conf import Lang, LangUI, ResMap, signals, StyleSheet
@@ -223,6 +221,44 @@ class GUI:
         box = QCheckBox(text)
         box.setFont(GUI.font())
         return box
+
+    @staticmethod
+    def create_group_box(title: str = ''):
+        box = QGroupBox(title)
+        return box
+
+    @staticmethod
+    def create_list_item(parent: QListWidget, text: str, icon: str = None):
+        if icon is not None:
+            item = QListWidgetItem(GUI.icon(icon), text, parent)
+        else:
+            item = QListWidgetItem(text, parent)
+        item.setFont(GUI.font())
+        return item
+
+    @staticmethod
+    def create_table_widget(headers: List[str]):
+        table = QTableWidget()
+        table.setFont(GUI.font())
+        table.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        table.setColumnCount(len(headers))
+        table.setHorizontalHeaderLabels(headers)
+        header_font = GUI.font()
+        header_font.setBold(True)
+        table.horizontalHeader().setSectionsClickable(False)
+        table.horizontalHeader().setFont(header_font)
+        table.verticalHeader().setFont(header_font)
+        return table
+
+    @staticmethod
+    def create_table_item(text: str, icon: str = None, tag: int = 0):
+        if icon is not None:
+            item = QTableWidgetItem(GUI.icon(icon), text, tag)
+        else:
+            item = QTableWidgetItem(text, tag)
+        item.setTextAlignment(Qt.AlignCenter)
+        item.setFont(GUI.font())
+        return item
 
     @staticmethod
     def create_radio_group(title: str, items: tuple[str], ids: tuple[int], default_id: int):

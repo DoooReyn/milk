@@ -11,6 +11,7 @@ from milk.view.texture.unpacker_view import TextureUnpackerView
 from milk.view.translate.translate_view import TranslateView
 from milk.view.wallpaper.wallpaper_view import WallPaperView
 from milk.view.weread.weread import WeRead
+from milk.view.lua.syntax_inspection_view import SyntaxInspectionView
 
 
 class Window(QMainWindow):
@@ -76,7 +77,7 @@ class Window(QMainWindow):
 
     @staticmethod
     def on_menu_exit_app():
-        QApplication.exit(0)
+        QApplication.exit()
 
     def open_menu(self, ui: UIDef, class_obj):
         win = self.windows[ui.name]
@@ -157,6 +158,9 @@ class Window(QMainWindow):
 
     def on_menu_lua_encoding(self):
         self.open_menu(UIDef.LuaEncodingChecker, EncodingDetectionView)
+
+    def on_menu_lua_grammar(self):
+        self.open_menu(UIDef.LuaGrammarChecker, SyntaxInspectionView)
 
     def closeEvent(self, evt):
         for key, win in self.windows.items():

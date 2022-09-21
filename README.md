@@ -41,3 +41,7 @@
 - ✔ 文件编码检测与转换工具
 
   ![](screenshot/EncodingDetection.png)
+
+- ✔ Lua 语法检测工具
+
+  ![](screenshot/LuaGrammarChecker.png)

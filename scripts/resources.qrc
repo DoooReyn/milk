@@ -30,6 +30,7 @@
 <file alias="img/config.svg">statics/img/config.svg</file>
 <file alias="img/consume.svg">statics/img/consume.svg</file>
 <file alias="img/copy-one.svg">statics/img/copy-one.svg</file>
+<file alias="img/correct.svg">statics/img/correct.svg</file>
 <file alias="img/cursor.svg">statics/img/cursor.svg</file>
 <file alias="img/delete-themes.svg">statics/img/delete-themes.svg</file>
 <file alias="img/document-folder.svg">statics/img/document-folder.svg</file>
@@ -39,6 +40,7 @@
 <file alias="img/editor.svg">statics/img/editor.svg</file>
 <file alias="img/endless.svg">statics/img/endless.svg</file>
 <file alias="img/english.svg">statics/img/english.svg</file>
+<file alias="img/error.svg">statics/img/error.svg</file>
 <file alias="img/excel_file-excel.svg">statics/img/excel_file-excel.svg</file>
 <file alias="img/expand-text-input.svg">statics/img/expand-text-input.svg</file>
 <file alias="img/file-addition-one.svg">statics/img/file-addition-one.svg</file>
