@@ -270,6 +270,8 @@ class UserKey:
         public_key = "tools:wallpaper:public_key"
         private_key = "tools:wallpaper:private_key"
         redirect_uri = "tools:wallpaper:redirect_uri"
+        window_width = "tools:wallpaper:window_width"
+        window_height = "tools:wallpaper:window_height"
         save_at = "tools:wallpaper:save_at"
 
     class Main:

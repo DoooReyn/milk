@@ -1,6 +1,7 @@
 from os import walk
 from os.path import exists, isdir, isfile, join, normpath, splitext
 from time import sleep
+from typing import Optional
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QColor
@@ -55,10 +56,14 @@ class EncodingDetectionView(_View):
         super(EncodingDetectionView, self).__init__()
 
         self.colors = [QColor('#ff6b81'), QColor('#6bddcd'), ]
-        self.color_index = 0
+        self.color_index: int = 0
+        self.thread: Optional[Cmm.StoppableThread] = None
+
         self.setWindowTitle(LangUI.lua_encoding_detection_title)
         self.setMinimumSize(640, 400)
+
         self.setup_window_code(UIDef.LuaEncodingChecker.value)
+        self.setup_resize_keys(UserKey.LuaEncodingDetection.window_width, UserKey.LuaEncodingDetection.window_height)
         self.setup_ui_signals()
         self.ui_edit_choose.setText(self.last_at())
 

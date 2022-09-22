@@ -111,6 +111,7 @@ class TranslateView(_View):
         super(TranslateView, self).__init__(parent)
         self.translator: ModelTranslator = ModelTranslator()
         self.setup_window_code(UIDef.ToolsTranslate.value)
+        self.setup_resize_keys(UserKey.Translator.window_width, UserKey.Translator.window_height)
         self.setup_ui_signals()
         self.setup_translation()
 

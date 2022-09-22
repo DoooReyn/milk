@@ -15,7 +15,7 @@ from PyQt5.QtWidgets import QAbstractItemView, QAction, QApplication, QButtonGro
 from win32gui import SystemParametersInfo
 
 from milk.cmm import Cmm
-from milk.conf import Lang, LangUI, ResMap, signals, StyleSheet
+from milk.conf import Lang, LangUI, ResMap, signals, StyleSheet, settings
 
 
 class GUI:
@@ -29,6 +29,7 @@ class GUI:
 
     class View(QWidget):
         window_code: int = 0
+        resize_keys: (str, str,) = None
 
         def closeEvent(self, event):
             if self.window_code > 0:
@@ -36,8 +37,31 @@ class GUI:
             event.accept()
             super().closeEvent(event)
 
+        def resizeEvent(self, event):
+            self.set_win_size(self.width(), self.height())
+            event.accept()
+            super().resizeEvent(event)
+
         def setup_window_code(self, code: int):
             self.window_code = code
+
+        def setup_resize_keys(self, kw: str, kh: str):
+            self.resize_keys = (kw, kh,)
+            w, h = self.get_win_size()
+            self.resize(w, h)
+
+        def get_win_size(self):
+            if self.resize_keys is not None:
+                kw, kh = self.resize_keys
+                return settings.value(kw, 640, int), settings.value(kh, 480, int)
+            else:
+                return self.width(), self.height()
+
+        def set_win_size(self, width: int, height: int):
+            if self.resize_keys is not None:
+                kw, kh = self.resize_keys
+                settings.setValue(kw, width)
+                settings.setValue(kh, height)
 
     class MsgBox:
         @staticmethod

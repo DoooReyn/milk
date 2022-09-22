@@ -1,7 +1,7 @@
 from PyQt5.QtCore import QUrl
 from PyQt5.QtGui import QKeySequence
 from PyQt5.QtWebEngineWidgets import QWebEngineView
-from PyQt5.QtWidgets import QShortcut, QWidget, QMenuBar, QMenu, QAction
+from PyQt5.QtWidgets import QMenu, QMenuBar, QShortcut, QWidget
 
 from milk.conf import UIDef
 

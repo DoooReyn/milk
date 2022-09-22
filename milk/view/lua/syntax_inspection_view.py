@@ -64,15 +64,15 @@ class SyntaxInspectionView(_View):
 
         self.row_info = []
         self.thread: Optional[Cmm.StoppableThread] = None
-        self.setup_window_code(UIDef.LuaGrammarChecker.value)
+
         self.setWindowTitle(LangUI.lua_grammar_title)
-        self.setMinimumSize(640, 640)
+        self.setMinimumSize(640, 480)
+        self.setup_window_code(UIDef.LuaGrammarChecker.value)
+        self.setup_resize_keys(UserKey.LuaGrammar.window_width, UserKey.LuaGrammar.window_height)
         self.setup_preferences()
         self.setup_ui_signals()
 
     def setup_preferences(self):
-        w, h = self.win_size()
-        self.resize(w, h)
         self.ui_edit_select.setText(self.lua_grammar_folder_at())
 
     def setup_ui_signals(self):
@@ -82,26 +82,11 @@ class SyntaxInspectionView(_View):
         self.ui_table_files.clicked.connect(self.on_item_double_clicked)
 
     @staticmethod
-    def win_size(width: int = None, height: int = None):
-        if width is not None and height is not None:
-            settings.setValue(UserKey.LuaGrammar.window_width, width)
-            settings.setValue(UserKey.LuaGrammar.window_height, height)
-        else:
-            w = settings.value(UserKey.LuaGrammar.window_width, 640, int)
-            h = settings.value(UserKey.LuaGrammar.window_height, 640, int)
-            return w, h
-
-    @staticmethod
     def lua_grammar_folder_at(at: str = None):
         if at is not None:
             settings.setValue(UserKey.LuaGrammar.folder_at, at)
         else:
             return settings.value(UserKey.LuaGrammar.folder_at, Cmm.user_document_dir(), str)
-
-    def resizeEvent(self, event) -> None:
-        self.win_size(self.width(), self.height())
-        event.accept()
-        super(SyntaxInspectionView, self).resizeEvent(event)
 
     def closeEvent(self, event):
         if self.thread is not None:

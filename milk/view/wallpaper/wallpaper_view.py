@@ -82,8 +82,11 @@ class WallPaperView(_View):
         self.network_reply: Optional[QNetworkReply] = None
         self.temp_file_handler: Optional[QFile] = None
         self.file_link: Optional[QUrl] = None
+
         self.setWindowTitle(LangUI.wallpaper_title)
+
         self.setup_window_code(UIDef.ToolsWallpaper.value)
+        self.setup_resize_keys(UserKey.Wallpaper.window_width, UserKey.Wallpaper.window_height)
         self.setMinimumSize(500, 184)
         self.setup_ui_signals()
         self.setup_preferences()

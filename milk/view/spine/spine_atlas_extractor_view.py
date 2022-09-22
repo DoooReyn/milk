@@ -54,7 +54,9 @@ class SpineAtlasExtractorView(_View):
 
         self.setFixedSize(500, 118)
         self.setWindowTitle(LangUI.atlas_extractor_title)
+
         self.setup_window_code(UIDef.ImageSpineAtlasExtractor.value)
+        self.setup_resize_keys(UserKey.SpineAtlasExtractor.window_width, UserKey.SpineAtlasExtractor.window_height)
         self.setup_ui_signals()
         self.setup_preferences()
 
