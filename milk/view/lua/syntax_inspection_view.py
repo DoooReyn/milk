@@ -6,19 +6,10 @@ from typing import List, Optional
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QAbstractItemView, QHeaderView, QSplitter, QTableWidgetItem
 
-from cmm import Cmm
-from conf import ResMap, settings, UIDef, UserKey
-from gui import GUI
+from milk.cmm import Cmm
+from milk.conf import LangUI, ResMap, settings, StyleSheet, UIDef, UserKey
+from milk.gui import GUI
 from .lua_syntax_checker import LuaSyntaxChecker
-
-HeaderStyleSheet = """
-QHeaderView::section
-{
-spacing: 10px;
-border: 1px solid #ebebeb;
-margin: 1px;
-}
-"""
 
 
 class _View(GUI.View):
@@ -26,15 +17,15 @@ class _View(GUI.View):
         super(_View, self).__init__()
 
         # create widgets
-        self.ui_label_select = GUI.create_label('选取Lua目录')
-        self.ui_edit_select = GUI.create_line_edit(readonly=True, placeholder='选取Lua目录')
+        self.ui_label_select = GUI.create_label(LangUI.lua_grammar_folder_at)
+        self.ui_edit_select = GUI.create_line_edit(readonly=True, placeholder=LangUI.lua_grammar_folder_at)
         self.ui_act_select = GUI.set_folder_action_for_line_edit(self.ui_edit_select)
-        self.ui_btn_check = GUI.create_push_btn('开始检测')
-        self.ui_group_files = GUI.create_group_box('检测结果')
+        self.ui_btn_check = GUI.create_push_btn(LangUI.lua_grammar_check_start)
+        self.ui_group_files = GUI.create_group_box(LangUI.lua_grammar_check_result)
         self.ui_group_files_layout = GUI.create_horizontal_layout(self.ui_group_files)
-        self.ui_table_files = GUI.create_table_widget(['文件名', '最大嵌套层数'])
+        self.ui_table_files = GUI.create_table_widget([LangUI.lua_grammar_lua_filename, LangUI.lua_grammar_max_nested])
         self.ui_table_files.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
-        self.ui_table_files.horizontalHeader().setStyleSheet(HeaderStyleSheet)
+        self.ui_table_files.horizontalHeader().setStyleSheet(StyleSheet.HeaderView)
         self.ui_table_files.setMinimumWidth(300)
         # self.ui_table_files.setSelectionBehavior(QAbstractItemView.SelectionBehavior.)
         self.ui_table_files.setSelectionMode(QAbstractItemView.SingleSelection)
@@ -74,7 +65,7 @@ class SyntaxInspectionView(_View):
         self.row_info = []
         self.thread: Optional[Cmm.StoppableThread] = None
         self.setup_window_code(UIDef.LuaGrammarChecker.value)
-        self.setWindowTitle('Lua语法检测')
+        self.setWindowTitle(LangUI.lua_grammar_title)
         self.setMinimumSize(640, 640)
         self.setup_preferences()
         self.setup_ui_signals()
@@ -118,7 +109,7 @@ class SyntaxInspectionView(_View):
         super(SyntaxInspectionView, self).closeEvent(event)
 
     def on_select_folder(self):
-        chosen = GUI.dialog_for_directory_selection(self, '选取Lua目录', self.lua_grammar_folder_at())
+        chosen = GUI.dialog_for_directory_selection(self, LangUI.lua_grammar_folder_at, self.lua_grammar_folder_at())
         if chosen is not None:
             self.ui_edit_select.setText(chosen)
             self.lua_grammar_folder_at(chosen)
@@ -204,7 +195,7 @@ class SyntaxInspectionView(_View):
         self.ui_tb_nested.clear()
         self.ui_tb_nested.hide()
         limit_level = 5
-        start = limit_level+1
+        start = limit_level + 1
         if blocks is not None:
             blocks = reversed(blocks[start:])
             display = False

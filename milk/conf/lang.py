@@ -159,3 +159,11 @@ class LangUI:
     lua_encoding_detection_file_not_found = "{} 不存在"
     lua_encoding_detection_convert_ok = "<成功>"
     lua_encoding_detection_convert_bad = "<失败>"
+
+    lua_grammar_title = 'Lua语法检测'
+    lua_grammar_nested_level = "<b>[嵌套层级 {}]</b>"
+    lua_grammar_max_nested = "最大嵌套层数"
+    lua_grammar_folder_at = "选取Lua目录"
+    lua_grammar_check_start = "开始检测"
+    lua_grammar_check_result = "检测结果"
+    lua_grammar_lua_filename = "文件名"

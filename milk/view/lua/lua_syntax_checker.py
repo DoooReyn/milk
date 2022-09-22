@@ -3,7 +3,8 @@ from typing import List, Optional
 from luaparser.ast import ASTRecursiveVisitor, parse, SyntaxException, to_lua_source
 from luaparser.astnodes import Block
 
-from cmm import Cmm
+from milk.cmm import Cmm
+from milk.conf import LangUI
 
 
 def block_statements(node: Block):
@@ -23,7 +24,7 @@ class WrapBlock:
         return d
 
     def source(self):
-        return ['<b>[嵌套层级 {}]</b>'.format(self.level), to_lua_source(self.node), '\n']
+        return [LangUI.lua_grammar_nested_level.format(self.level), to_lua_source(self.node), '\n']
 
 
 class NestedVisitor(ASTRecursiveVisitor):
@@ -103,9 +104,3 @@ class LuaSyntaxChecker:
         except (SyntaxException, UnicodeDecodeError, Exception) as e:
             print(e)
             return False, None
-
-# if __name__ == '__main__':
-#     file_path = r'F:\repo\zqgame\lieyan\client\tool\lua_lexer\test.lua'
-#     syntax_ok = LuaSyntaxChecker.check_by_file(file_path)
-#     print('syntax: ', 'good' if syntax_ok else 'bad')
-#     check_file_nested_level(file_path)
