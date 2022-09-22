@@ -60,7 +60,7 @@ class EncodingDetectionView(_View):
         self.thread: Optional[Cmm.StoppableThread] = None
 
         self.setWindowTitle(LangUI.lua_encoding_detection_title)
-        self.setMinimumSize(640, 400)
+        self.setMinimumSize(GUI.view_size())
 
         self.setup_window_code(UIDef.LuaEncodingChecker.value)
         self.setup_resize_keys(UserKey.LuaEncodingDetection.window_width, UserKey.LuaEncodingDetection.window_height)

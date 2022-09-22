@@ -21,6 +21,21 @@ from milk.conf import Lang, LangUI, ResMap, signals, StyleSheet, settings
 class GUI:
     # region start - class
 
+    class Preferences:
+        layout_spacing = 8
+
+        font_size = 11
+
+        line_height = 36
+
+        button_size = QSize(84, 36)
+
+        view_size = QSize(640, 480)
+
+        minimum_line_width = 400
+
+        font_name = 'Microsoft YaHei'
+
     class GridItem:
         def __init__(self, widget: QWidget, start: int, col_span: int):
             self.widget = widget
@@ -86,29 +101,17 @@ class GUI:
 
     # region end - class
 
-    # region start - property
-
-    layout_spacing = 8
-
-    font_size = 11
-
-    line_height = 36
-
-    button_size = QSize(84, 36)
-
-    minimum_line_width = 400
-
-    font_name = 'Microsoft YaHei'
-
-    # region end - property
-
     # region start - staticmethod
+
+    @staticmethod
+    def view_size():
+        return GUI.Preferences.view_size
 
     @staticmethod
     def font():
         font = QFont()
-        font.setPointSize(GUI.font_size)
-        font.setFamily(GUI.font_name)
+        font.setPointSize(GUI.Preferences.font_size)
+        font.setFamily(GUI.Preferences.font_name)
         return font
 
     @staticmethod
@@ -180,21 +183,21 @@ class GUI:
     @staticmethod
     def create_grid_layout(parent: QWidget):
         layout = QGridLayout()
-        layout.setSpacing(GUI.layout_spacing)
+        layout.setSpacing(GUI.Preferences.layout_spacing)
         parent.setLayout(layout)
         return layout
 
     @staticmethod
     def create_horizontal_layout(parent: QWidget):
         layout = QHBoxLayout()
-        layout.setSpacing(GUI.layout_spacing)
+        layout.setSpacing(GUI.Preferences.layout_spacing)
         parent.setLayout(layout)
         return layout
 
     @staticmethod
     def create_vertical_layout(parent: QWidget):
         layout = QVBoxLayout()
-        layout.setSpacing(GUI.layout_spacing)
+        layout.setSpacing(GUI.Preferences.layout_spacing)
         parent.setLayout(layout)
         return layout
 
@@ -323,7 +326,7 @@ class GUI:
     @staticmethod
     def create_check_button(text: str, checked: bool = True):
         child = GUI.create_push_btn(text)
-        child.setFixedSize(GUI.button_size)
+        child.setFixedSize(GUI.Preferences.button_size)
         child.setCheckable(True)
         child.setChecked(checked)
         child.setStyleSheet(StyleSheet.CheckButton)
