@@ -1,0 +1,9 @@
+*.pyc
+*.jar
+*.tokens
+.idea
+build
+dist
+luaparser.egg-info
+venv
+.venv
