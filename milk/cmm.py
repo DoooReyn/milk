@@ -173,3 +173,8 @@ class Cmm:
                 starts_with_dot = True
                 break
         return starts_with_dot
+
+    @staticmethod
+    def save_file_content(where: str, content: str):
+        with open(where, 'w+', encoding='utf-8') as lf:
+            lf.write(content)

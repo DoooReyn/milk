@@ -546,12 +546,12 @@ class LuaRestoreTree:
         with open(self.file_at, 'r', encoding=self._encoding()) as fp:
             return fp.read()
 
-    def _root(self):
+    def root(self):
         return parse(self._content())
 
     def parse(self):
-        root = self._root()
-        return LuaSourceInterpreter(bracket_table_field=True).interpret(root)
+        root = self.root()
+        return LuaSourceInterpreter(bracket_table_field=True, ).interpret(root)
 
     def comment(self):
         class BlockComments:
@@ -593,7 +593,7 @@ class LuaRestoreTree:
                 # print('enter comment: ', node.is_tail, node.s)
 
         _visitor = Visitor()
-        _visitor.visit(self._root())
+        _visitor.visit(self.root())
         return _visitor.all_plate_comments
 
 

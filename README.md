@@ -14,7 +14,6 @@
 - ❌ Offline API Docs
 - ❌ Excel to Lua / Json / Xml 
 - ❌ 密码管理器
-- ❌ 整合 UIBase / Cmm.MsgBox 到 GUI
 
 ## Done
 

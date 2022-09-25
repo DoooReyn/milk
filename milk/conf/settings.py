@@ -310,6 +310,12 @@ class UserKey:
         window_width = "lua:grammar:window_width"
         window_height = "lua:grammar:window_height"
 
+    class LuaMinifier:
+        folder_at = "lua:minifier:folder_at"
+        window_rect = "lua:minifier:window_rect"
+        window_width = "lua:minifier:window_width"
+        window_height = "lua:minifier:window_height"
+
 
 local_dir = QStandardPaths.writableLocation(QStandardPaths.AppConfigLocation)
 app_dir = path.join(local_dir, Settings.Names.app)

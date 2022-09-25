@@ -36,7 +36,7 @@ Lang = dict({
     "item_lua_grammar": "语法检测",
     "item_lua_encoding": "编码检测",
     "item_lua_encrypt": "加密解密",
-    "item_lua_compress": "代码压缩",
+    "item_lua_compress": "代码简化",
     "item_lua_garbage": "垃圾代码",
 
     "menu_doc": "API文档",
@@ -167,3 +167,11 @@ class LangUI:
     lua_grammar_check_start = "开始检测"
     lua_grammar_check_result = "检测结果"
     lua_grammar_lua_filename = "文件名"
+
+    lua_minifier_title = 'Lua代码简化'
+    lua_minifier_folder_at = '选取Lua目录'
+    lua_minifier_start = '开始'
+    lua_minifier_options = '选项'
+    lua_minifier_replace = '替换源文件，否则保存到备份文件'
+    lua_minifier_keep_comment = '保留注释'
+    lua_minifier_wrap_table = '始终显示键值对'

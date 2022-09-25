@@ -15,7 +15,7 @@ from PyQt5.QtWidgets import QAbstractItemView, QAction, QApplication, QButtonGro
 from win32gui import SystemParametersInfo
 
 from milk.cmm import Cmm
-from milk.conf import Lang, LangUI, ResMap, signals, StyleSheet, settings
+from milk.conf import Lang, LangUI, ResMap, settings, signals, StyleSheet
 
 
 class GUI:
@@ -45,8 +45,11 @@ class GUI:
     class View(QWidget):
         window_code: int = 0
         resize_keys: (str, str,) = None
+        rect_key: str = None
 
         def closeEvent(self, event):
+            if self.rect_key is not None:
+                self.save_win_rect()
             if self.window_code > 0:
                 signals.window_closed.emit(self.window_code)
             event.accept()
@@ -77,6 +80,25 @@ class GUI:
                 kw, kh = self.resize_keys
                 settings.setValue(kw, width)
                 settings.setValue(kh, height)
+
+        def setup_rect_key(self, kr: str):
+            self.rect_key = kr
+            tx, ty, w, h = self.get_win_rect()
+            self.setGeometry(tx, ty, w, h)
+
+        def get_win_rect(self):
+            if self.rect_key is not None:
+                return [int(v) for v in settings.value(self.rect_key, '640,960,1280,480', str).split(',')]
+            else:
+                r = self.geometry()
+                return r.topLeft().x(), r.topLeft().y(), r.width(), r.height()
+
+        def save_win_rect(self):
+            if self.rect_key is not None:
+                r = self.geometry()
+                rect = [r.topLeft().x(), r.topLeft().y(), r.width(), r.height()]
+                rect = ','.join([str(r) for r in rect])
+                settings.setValue(self.rect_key, rect)
 
     class MsgBox:
         @staticmethod

@@ -12,6 +12,7 @@ from milk.view.translate.translate_view import TranslateView
 from milk.view.wallpaper.wallpaper_view import WallPaperView
 from milk.view.weread.weread import WeRead
 from milk.view.lua.syntax_inspection_view import SyntaxInspectionView
+from milk.view.lua.source_minifier_view import SourceMinifierView
 
 
 class Window(QMainWindow):
@@ -158,6 +159,9 @@ class Window(QMainWindow):
 
     def on_menu_lua_encoding(self):
         self.open_menu(UIDef.LuaEncodingChecker, EncodingDetectionView)
+
+    def on_menu_lua_compress(self):
+        self.open_menu(UIDef.LuaMinifier, SourceMinifierView)
 
     def on_menu_lua_grammar(self):
         self.open_menu(UIDef.LuaGrammarChecker, SyntaxInspectionView)
