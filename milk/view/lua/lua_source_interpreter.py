@@ -13,16 +13,28 @@ class LuaSourceWriter:
         self._indent = 0
         self._start = False
 
+    def last(self, index: int = -1):
+        if len(self._lines) > 0:
+            return self._lines[index]
+
+    def pop_last(self):
+        self._lines.pop()
+
     def append_value(self, v):
         self._lines.append(str(v))
 
     def append_line(self):
-        self.append_value('\n')
-        self.append_value('\t' * self._indent)
+        self.append_value('\n' + '\t' * self._indent)
 
     def indent(self):
         self._indent += 1
         self.append_line()
+
+    def current_index(self):
+        return self._indent
+
+    def cal_indent(self, v: int):
+        self._indent += v
 
     def unindent(self):
         self._indent -= 1
@@ -34,14 +46,19 @@ class LuaSourceWriter:
     def tree(self):
         return '\n'.join(self._tree)
 
-    def append_node(self, v: str):
+    def slice(self, v: int):
+        return self._lines[v::]
+
+    def append_ast_node(self, v: str):
         self._tree.append('\t' * self._indent + str(v))
 
 
 class LuaSourceInterpreter:
-    def __init__(self):
+    def __init__(self, bracket_table_field: bool = False, with_comments: bool = True):
         self._writer = LuaSourceWriter()
         self._errors = []
+        self._with_comments = with_comments
+        self._bracket_table_field = bracket_table_field
 
     def interpret(self, chunk: Chunk):
         self._restore_block(chunk.body, False)
@@ -60,36 +77,119 @@ class LuaSourceInterpreter:
     def _append_error(self, e: str):
         self._errors.append(e)
 
+    def get_last_type(self):
+        last = self._writer.last()
+        if last is not None:
+            if last.endswith('{'):
+                return last, 1
+            if last.endswith('}') or last.endswith(',') or last.endswith(';') or last.endswith('end'):
+                return last, 4
+            elif last.find('\n') > -1:
+                return last, 2
+        return last, 3
+
+    def _restore_head_comments(self, node: Node):
+        if self._with_comments is True:
+            if isinstance(node.comments, list) and len(node.comments) > 0:
+                prefix = None
+                last, kind = self.get_last_type()
+                if kind == 1:
+                    self._writer.indent()
+                    prefix = '\n' + '\t' * self._writer.current_index()
+                elif kind == 2:
+                    prefix = last
+                elif kind == 3:
+                    prefix = '\n' + '\t' * self._writer.current_index()
+                elif kind == 4:
+                    prefix = '\n' + '\t' * (self._writer.current_index() + 1)
+                    self._writer.append_value(prefix)
+
+                fmt = '【head】\n    kind    = {}\n    last    = {}\n    prefix  = {}\n    comment = {}'
+                print(fmt.format(kind, repr(last), repr(prefix), [c.s for c in node.comments]))
+
+                self._writer.append_value(prefix.join([c.s for c in node.comments]))
+                if kind == 1:
+                    self._writer.cal_indent(-1)
+                elif kind == 2 or kind == 3:
+                    self._writer.append_line()
+
+    def _restore_tail_comments(self, node: Node):
+        if self._with_comments is True:
+            if isinstance(node.tail_comments, list) and len(node.tail_comments) > 0:
+                prefix = None
+                last, kind = self.get_last_type()
+                if kind == 1:
+                    self._writer.indent()
+                    prefix = '\n' + '\t' * self._writer.current_index()
+                elif kind == 2:
+                    prefix = last
+                elif kind == 3:
+                    self._writer.append_line()
+                    prefix = '\n' + '\t' * self._writer.current_index()
+                elif kind == 4:
+                    prefix = '\n' + '\t' * self._writer.current_index()
+                    self._writer.append_value(prefix)
+
+                fmt = '【tail】\n    kind    = {}\n    last    = {}\n    prefix  = {}\n    comment = {}'
+                print(fmt.format(kind, repr(last), repr(prefix), [c.s for c in node.tail_comments]))
+
+                self._writer.append_value(prefix.join([c.s for c in node.tail_comments]))
+                if kind == 1:
+                    self._writer.cal_indent(-1)
+                elif kind == 2:
+                    self._writer.append_line()
+
+    def _restore_comment(self, comment: Union[Comment, str]):
+        if self._with_comments is False:
+            return
+        if isinstance(comment, str):
+            self._writer.append_value(comment)
+        elif isinstance(comment, Comment):
+            self._writer.append_value(comment.s)
+        self._writer.append_line()
+
     def _restore_block(self, node: Block, indent: bool = True):
         if indent is True:
             self._writer.indent()
-        self._restore_body(node.body)
+        for index, item in enumerate(node.body):
+            self._restore_node(item)
+            if index < len(node.body) - 1:
+                self._writer.append_line()
+        self._restore_tail_comments(node)
         if indent is True:
             self._writer.unindent()
 
-    def _restore_body(self, body: List[Statement]):
-        for index, statement in enumerate(body):
-            self._restore_node(statement)
-            if index < len(body) - 1:
-                self._writer.append_line()
-
     def _restore_node(self, node: Node):
-        self._writer.append_node(node.display_name)
+        self._writer.append_ast_node(node.display_name)
+        self._restore_head_comments(node)
         if isinstance(node, Expression):
             self._restore_interpreter(node)
+            self._restore_tail_comments(node)
         elif isinstance(node, Statement):
             self._restore_interpreter(node)
+            self._restore_tail_comments(node)
         elif isinstance(node, Block):
             self._restore_block(node)
+        elif isinstance(node, Comment):
+            # self._restore_comment(node)
+            pass
         else:
-            ("!!! [{}] Node skip...".format(node.display_name))
+            self._append_error("!!! [{}] Node skipped...".format(node.display_name))
 
-    def _restore_inner_node_list(self, nodes: List[Node]):
+    def _restore_inner_node_list(self, nodes: List[Node], split: bool = True):
         length = len(nodes)
         for index, item in enumerate(nodes):
             self._restore_node(item)
-            if index < length - 1:
+            if split and index < length - 1:
                 self._writer.append_value(', ')
+
+    def _interpret_Comment(self, node: Comment):
+        # self._writer.append_value(node.s)
+        # self._writer.append_line()
+        pass
+
+    def _interpret_tail_Comment(self, node: Comment):
+        self._writer.append_value(node.s)
 
     def _restore_interpreter(self, node: Union[Statement, Expression, Op]):
         fn_name = '_interpret_{}'.format(node.display_name)
@@ -259,7 +359,6 @@ class LuaSourceInterpreter:
         self._writer.append_value('return ')
         if node.values is not None:
             if isinstance(node.values, list):
-                print('! ', node.values)
                 self._restore_inner_node_list(node.values)
             elif isinstance(node.values, Node):
                 self._restore_node(node.values)
@@ -300,29 +399,44 @@ class LuaSourceInterpreter:
             self._writer.append_value('[[{}]]'.format(node.s))
 
     def _interpret_Field(self, node: Field):
-        self._writer.append_value('[')
-        if isinstance(node.key, Name):
-            self._writer.append_value('"{}"'.format(node.key.id))
-        elif isinstance(node.key, Number):
-            self._writer.append_value(node.key.n)
-        elif node.key is not None:
-            self._restore_node(node.key)
-        self._writer.append_value('] = ')
+        self._writer.indent()
+
+        if self._bracket_table_field:
+            self._writer.append_value('[')
+            if isinstance(node.key, Name):
+                self._writer.append_value("'{}'".format(node.key.id))
+            elif isinstance(node.key, Number):
+                self._writer.append_value(node.key.n)
+            elif node.key is not None:
+                self._restore_node(node.key)
+            self._writer.append_value('] = ')
+        else:
+            if isinstance(node.key, Name):
+                self._writer.append_value('{} = '.format(node.key.id))
+            elif isinstance(node.key, Number):
+                pass
+            elif node.key is not None:
+                self._writer.append_value('[')
+                self._restore_node(node.key)
+                self._writer.append_value('] = ')
+
         self._restore_node(node.value)
 
+        self._writer.unindent()
+
     def _interpret_Table(self, node: Table):
-        table_len = len(node.fields)
-        table_break = table_len > 1
-        self._writer.append_value('{')
-        if table_break is True:
+        if self._with_comments and (len(node.comments) > 0 or len(node.tail_comments) > 0):
             self._writer.indent()
+        self._writer.append_value('{')
+
+        table_len = len(node.fields)
         for index, filed in enumerate(node.fields):
             self._restore_node(filed)
             if index < table_len - 1:
+                last = self._writer.last()
+                if last and last.find('\n') > -1:
+                    self._writer.pop_last()
                 self._writer.append_value(',')
-                self._writer.append_line()
-        if table_break is True:
-            self._writer.unindent()
         self._writer.append_value('}')
 
     def _interpret_Dots(self, _: Dots):
@@ -425,17 +539,63 @@ class LuaRestoreTree:
     def __init__(self, filepath: str):
         self.file_at = filepath
 
-    def encoding(self):
+    def _encoding(self):
         return Cmm.get_file_encoding(self.file_at)
 
-    def content(self):
-        with open(self.file_at, 'r', encoding=self.encoding()) as fp:
+    def _content(self):
+        with open(self.file_at, 'r', encoding=self._encoding()) as fp:
             return fp.read()
 
+    def _root(self):
+        return parse(self._content())
+
     def parse(self):
-        content = self.content()
-        root = parse(content)
-        return LuaSourceInterpreter().interpret(root)
+        root = self._root()
+        return LuaSourceInterpreter(bracket_table_field=True).interpret(root)
+
+    def comment(self):
+        class BlockComments:
+            def __init__(self):
+                self.head = []
+                self.tail = []
+
+            def clear(self):
+                self.head.clear()
+                self.tail.clear()
+
+            def to_list(self):
+                return self.head + self.tail
+
+        class Visitor(ASTRecursiveVisitor):
+            def __init__(self):
+                self.current_id = None
+                self.all_block_comments = {}
+                self.all_plate_comments = []
+
+            def enter_Block(self, node: Block):
+                self.current_id = id(node)
+                self.all_block_comments[self.current_id] = BlockComments()
+                # print('enter Block')
+
+            def exit_Block(self, node: Block):
+                block_comment = self.all_block_comments[id(node)]
+                self.all_plate_comments.extend(block_comment.to_list())
+                self.current_id = None
+                # print('exit Block')
+                # print(block_comment.to_list())
+
+            def enter_Comment(self, node: Comment):
+                block_comment = self.all_block_comments[self.current_id]
+                if node.is_tail:
+                    block_comment.tail.append(node.s)
+                else:
+                    block_comment.head.append(node.s)
+                # print('enter comment: ', node.is_tail, node.s)
+
+        visitor = Visitor()
+        visitor.visit(self._root())
+
+        print(visitor.all_plate_comments)
 
 
 if __name__ == '__main__':
@@ -444,17 +604,21 @@ if __name__ == '__main__':
             f.write(content)
 
 
-    test_at = r"F:\repo\zqgame\lieyan\client\tool\lua_lexer\lexer.lua"
-    interpreter = LuaRestoreTree(test_at).parse()
+    test_at = r"F:\repo\zqgame\lieyan\client\tool\lua_lexer\test.lua"
 
+    restore = LuaRestoreTree(test_at)
+
+    interpreter = restore.parse()
     text = interpreter.content()
     save_result(text)
-
     tree = interpreter.tree()
     print('> AST tree:')
     print(tree)
-
     errors = interpreter.errors()
     if errors is not None:
         print('\n> Errors:')
         print(errors)
+
+    restore.comment()
+
+    # save_result(to_pretty_str(restore.root()))
