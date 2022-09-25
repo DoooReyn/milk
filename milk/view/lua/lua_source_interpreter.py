@@ -592,10 +592,9 @@ class LuaRestoreTree:
                     block_comment.head.append(node.s)
                 # print('enter comment: ', node.is_tail, node.s)
 
-        visitor = Visitor()
-        visitor.visit(self._root())
-
-        print(visitor.all_plate_comments)
+        _visitor = Visitor()
+        _visitor.visit(self._root())
+        return _visitor.all_plate_comments
 
 
 if __name__ == '__main__':
