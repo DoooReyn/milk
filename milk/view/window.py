@@ -13,6 +13,7 @@ from milk.view.wallpaper.wallpaper_view import WallPaperView
 from milk.view.weread.weread import WeRead
 from milk.view.lua.syntax_inspection_view import SyntaxInspectionView
 from milk.view.lua.source_minifier_view import SourceMinifierView
+from milk.view.lua.element_extractor_view import ElementExtractorView
 
 
 class Window(QMainWindow):
@@ -165,6 +166,9 @@ class Window(QMainWindow):
 
     def on_menu_lua_grammar(self):
         self.open_menu(UIDef.LuaGrammarChecker, SyntaxInspectionView)
+
+    def on_menu_lua_extractor(self):
+        self.open_menu(UIDef.LuaExtractor, ElementExtractorView)
 
     def closeEvent(self, evt):
         for key, win in self.windows.items():

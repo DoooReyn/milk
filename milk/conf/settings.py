@@ -200,6 +200,11 @@ class Settings:
                     "trigger": "on_menu_lua_garbage",
                     "icon": ResMap.img_shuffle_one
                 },
+                {
+                    "name": "item_lua_extractor",
+                    "trigger": "on_menu_lua_extractor",
+                    "icon": ResMap.img_find
+                },
             )
 
         class MenuDoc:
@@ -307,6 +312,10 @@ class UserKey:
     class LuaMinifier:
         folder_at = "lua:minifier:folder_at"
         window_rect = "lua:minifier:window_rect"
+
+    class LuaExtractor:
+        file_at = "lua:extractor:file_at"
+        window_rect = "lua:extractor:window_rect"
 
 
 local_dir = QStandardPaths.writableLocation(QStandardPaths.AppConfigLocation)

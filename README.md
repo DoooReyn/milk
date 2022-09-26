@@ -44,3 +44,11 @@
 - ✔ Lua 语法检测工具
 
   ![](screenshot/LuaGrammarChecker.png)
+
+- ✔ Lua 代码简化工具
+
+  ![](screenshot/LuaMinifier.png)
+
+- ✔ Lua 元素提取器
+
+  ![](screenshot/LuaElementExtractor.png)

@@ -38,6 +38,7 @@ Lang = dict({
     "item_lua_encrypt": "加密解密",
     "item_lua_compress": "代码简化",
     "item_lua_garbage": "垃圾代码",
+    "item_lua_extractor": "元素提取",
 
     "menu_doc": "API文档",
     "item_doc_cocos2dx": "Cocos2d-x",
@@ -175,3 +176,12 @@ class LangUI:
     lua_minifier_replace = '替换源文件，否则保存到备份文件'
     lua_minifier_keep_comment = '保留注释'
     lua_minifier_wrap_table = '始终显示键值对'
+
+    lua_extractor_title = 'Lua元素提取器'
+    lua_extractor_file_at = "选择Lua文件"
+    lua_extractor_start = '提取'
+    lua_extractor_copy = '复制元素'
+    lua_extractor_options = '可选元素'
+    lua_extractor_ele_comment = '注释'
+    lua_extractor_ele_string = '字符串'
+    lua_extractor_ele_function = 'Function'

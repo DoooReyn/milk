@@ -34,6 +34,7 @@ class UIDef(Enum):
     LuaCrypto = 403
     LuaMinifier = 404
     LuaGarbage = 405
+    LuaExtractor = 406
 
     DocCocos2dx = 501
     DocCocosCreator = 502

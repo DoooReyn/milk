@@ -597,6 +597,65 @@ class LuaRestoreTree:
         return _visitor.all_plate_comments
 
 
+class LuaSourceExtractor(LuaRestoreTree):
+    def __init__(self, filepath: str):
+        super(LuaSourceExtractor, self).__init__(filepath)
+
+    def parse(self):
+        class Element:
+            def __init__(self, name: str, line: int, content: str):
+                self.name = name
+                self.line = line
+                self.content = content
+
+            def data(self):
+                return self.name, str(self.line), self.content,
+
+        class ElementVisitor(ASTRecursiveVisitor):
+            def __init__(self):
+                super(ElementVisitor, self).__init__()
+                self._functions: List[Element] = []
+                self._comments: List[Element] = []
+                self._strings: List[Element] = []
+
+            def enter_Comment(self, node: Comment):
+                self._comments.append(Element('comment', node.line, node.s))
+
+            def enter_Function(self, node: Function):
+                self.interpret_function(node)
+
+            def enter_LocalFunction(self, node: LocalFunction):
+                self.interpret_function(node)
+
+            def enter_Method(self, node: Method):
+                self.interpret_function(node)
+
+            def interpret_function(self, node: Union[Function, LocalFunction, Method]):
+                source = ""
+                if isinstance(node, Method):
+                    source = to_lua_source(node.source) + '.'
+                name = to_lua_source(node.name)
+                args = ' ,'.join([to_lua_source(arg) for arg in node.args])
+                func = '{}{} ( {} )'.format(source, name, args)
+                self._functions.append(Element('function', node.line, func))
+
+            def enter_String(self, node: String):
+                self._strings.append(Element('string', node.line, to_lua_source(node)))
+
+            def data(self):
+                return {
+                    "function": [c.data() for c in self._functions],
+                    "comment": [c.data() for c in self._comments],
+                    "string": [c.data() for c in self._strings],
+                }
+
+        root = self.root()
+        element_visitor = ElementVisitor()
+        element_visitor.visit(root)
+
+        return element_visitor.data()
+
+
 if __name__ == '__main__':
     def save_result(content: str):
         with open(r"F:\repo\zqgame\lieyan\client\tool\lua_lexer\test2.lua", 'w', encoding='utf-8') as f:

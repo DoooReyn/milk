@@ -6,12 +6,12 @@ from typing import List, Union
 import win32api
 import win32con
 from PyQt5.QtCore import QSize, Qt
-from PyQt5.QtGui import QFont, QIcon
+from PyQt5.QtGui import QColor, QFont, QIcon
 from PyQt5.QtWidgets import QAbstractItemView, QAction, QApplication, QButtonGroup, QCheckBox, QComboBox, QFileDialog, \
     QGridLayout, \
     QGroupBox, QHBoxLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem, QMenu, QMenuBar, QMessageBox, QProgressBar, \
     QPushButton, \
-    QRadioButton, QTableWidget, QTableWidgetItem, QTextBrowser, QTextEdit, QVBoxLayout, QWidget
+    QRadioButton, QTableWidget, QTableWidgetItem, QTextBrowser, QTextEdit, QTreeWidget, QVBoxLayout, QWidget
 from win32gui import SystemParametersInfo
 
 from milk.cmm import Cmm
@@ -116,6 +116,10 @@ class GUI:
     @staticmethod
     def icon(path: str):
         return QIcon(path)
+
+    @staticmethod
+    def color(color: str):
+        return QColor(color)
 
     @staticmethod
     def create_menu_bar(menus, parent: QWidget, target=None):
@@ -368,6 +372,10 @@ class GUI:
         return QApplication.instance()
 
     @staticmethod
+    def clipboard():
+        return QApplication.clipboard()
+
+    @staticmethod
     def dialog_for_file_selection(parent: QWidget, title: str, start: str, file_filter: str = 'Any Files(*.*)'):
         start = start if len(start) > 0 else Cmm.user_document_dir()
         chosen = QFileDialog.getOpenFileName(parent, title, start, file_filter)
@@ -414,6 +422,10 @@ class GUI:
     @staticmethod
     def create_list_widget():
         return QListWidget()
+
+    @staticmethod
+    def create_tree_widget():
+        return QTreeWidget()
 
     @staticmethod
     def hv_layout_widgets(layout: Union[QHBoxLayout, QVBoxLayout], widgets: Cmm.Iterable[QWidget]):

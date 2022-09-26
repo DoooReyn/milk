@@ -12,4 +12,10 @@ class StyleSheet:
         border: 1px solid #ebebeb;
         margin: 1px;
         }
+        QHeaderView::section::title
+        {
+        font: bold;
+        text-align: center;
+        }
         """
+    TreeView = "QTreeView::item { padding: 4px }"
