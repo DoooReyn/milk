@@ -1,13 +1,14 @@
 from os import walk
 from os.path import exists, isdir, isfile, join, normpath, splitext
-from time import sleep
-from typing import List, Optional
+from typing import List
+from traceback import format_exception_only
 
 from PyQt5.QtCore import Qt
 
-from cmm import Cmm
-from conf import LangUI, settings, UIDef, UserKey, StyleSheet
+from milk.cmm import Cmm
+from milk.conf import LangUI, settings, StyleSheet, UIDef, UserKey, signals
 from milk.gui import GUI
+from milk.thread_runner import ThreadRunner
 from .lua_source_interpreter import LuaRestoreTree, LuaSourceInterpreter
 
 
@@ -53,8 +54,6 @@ class SourceMinifierView(_View):
     def __init__(self):
         super(SourceMinifierView, self).__init__()
 
-        self.thread: Optional[Cmm.StoppableThread] = None
-
         self.setWindowTitle(LangUI.lua_minifier_title)
         self.setMinimumSize(640, 480)
         self.setup_window_code(UIDef.LuaMinifier.value)
@@ -75,11 +74,6 @@ class SourceMinifierView(_View):
             settings.setValue(UserKey.LuaMinifier.folder_at, at)
         else:
             return settings.value(UserKey.LuaMinifier.folder_at, Cmm.user_document_dir(), str)
-
-    def closeEvent(self, event):
-        if self.thread is not None:
-            self.thread.stop()
-        super(SourceMinifierView, self).closeEvent(event)
 
     def on_select_folder(self):
         chosen = GUI.dialog_for_directory_selection(self, LangUI.lua_minifier_folder_at, self.lua_minifier_folder_at())
@@ -127,22 +121,18 @@ class SourceMinifierView(_View):
     def check_all(self, files: List[str]):
         files.reverse()
 
-        def check_one():
-            while len(files) > 0:
-                where = files.pop()
-                self.check_one(where)
-                sleep(0.015)
+        def on_running():
+            if len(files) == 0:
+                self.set_widgets_enabled(True)
+                runner.stop(tid)
+                return
+            where = files.pop()
+            self.check_one(where)
 
-            if self.thread:
-                self.thread.stop()
-                self.thread = None
+        runner = ThreadRunner()
+        tid = runner.start(runner=on_running)
 
-            self.set_widgets_enabled(True)
-
-        self.thread = Cmm.StoppableThread(target=check_one)
-        self.thread.daemon = True
-        self.thread.start()
-
+    # noinspection PyBroadException
     def check_one(self, where: str):
         target = where
         if self.ui_check_replace.isChecked() is False:
@@ -160,4 +150,4 @@ class SourceMinifierView(_View):
             self.ui_tb_log.append('<p style="color:green;">{}: OK</p>'.format(target))
         except Exception as e:
             self.ui_tb_log.append('<p style="color:red;">{}: Bad</p>'.format(target))
-            print(e)
+            signals.logger_error.emit('\n'.join(format_exception_only(e)))

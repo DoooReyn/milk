@@ -3,7 +3,6 @@ from os.path import dirname, isdir, join, realpath, splitext
 from random import randint
 from shutil import rmtree
 from sys import executable
-from threading import Event, Thread
 from traceback import format_exc, print_exc
 
 import cchardet
@@ -18,17 +17,6 @@ except (AttributeError, ImportError):
 
 class Cmm:
     Iterable = Iterable
-
-    class StoppableThread(Thread):
-        def __init__(self, **kwargs):
-            super(Cmm.StoppableThread, self).__init__(**kwargs)
-            self._stop_event = Event()
-
-        def stop(self):
-            self._stop_event.set()
-
-        def stopped(self):
-            return self._stop_event.is_set()
 
     # noinspection PyBroadException
     @staticmethod

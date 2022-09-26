@@ -1,7 +1,5 @@
 from os import walk
 from os.path import exists, isdir, isfile, join, normpath, splitext
-from time import sleep
-from typing import Optional
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QColor
@@ -10,6 +8,7 @@ from PyQt5.QtWidgets import QTextEdit
 from milk.cmm import Cmm
 from milk.conf import LangUI, settings, StyleSheet, UIDef, UserKey
 from milk.gui import GUI
+from milk.thread_runner import ThreadRunner
 
 
 class _View(GUI.View):
@@ -57,7 +56,6 @@ class EncodingDetectionView(_View):
 
         self.colors = [QColor('#ff6b81'), QColor('#6bddcd'), ]
         self.color_index: int = 0
-        self.thread: Optional[Cmm.StoppableThread] = None
 
         self.setWindowTitle(LangUI.lua_encoding_detection_title)
         self.setMinimumSize(GUI.view_size())
@@ -134,26 +132,16 @@ class EncodingDetectionView(_View):
     def _detect_encoding(self, file_list: [str]):
         file_list.reverse()
 
-        def _run():
-            while len(file_list) > 0:
-                where = file_list.pop()
-                self.detect_one(where)
-                sleep(0.015)
+        def on_running():
+            if len(file_list) == 0:
+                self.set_widgets_enabled(True)
+                runner.stop(tid)
+                return
+            where = file_list.pop()
+            self.detect_one(where)
 
-            if self.thread:
-                self.thread.stop()
-                self.thread = None
-
-            self.set_widgets_enabled(True)
-
-        self.thread = Cmm.StoppableThread(target=_run)
-        self.thread.daemon = True
-        self.thread.start()
-
-    def closeEvent(self, event):
-        if self.thread is not None:
-            self.thread.stop()
-        super(EncodingDetectionView, self).closeEvent(event)
+        runner = ThreadRunner()
+        tid = runner.start(runner=on_running)
 
     def ok(self, text: str):
         self.set_next_color()

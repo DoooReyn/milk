@@ -1,7 +1,6 @@
 from os import walk
 from os.path import exists, isdir, isfile, join, normpath, relpath, splitext
-from time import sleep
-from typing import List, Optional
+from typing import List
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QAbstractItemView, QHeaderView, QSplitter, QTableWidgetItem
@@ -9,6 +8,7 @@ from PyQt5.QtWidgets import QAbstractItemView, QHeaderView, QSplitter, QTableWid
 from milk.cmm import Cmm
 from milk.conf import LangUI, ResMap, settings, StyleSheet, UIDef, UserKey
 from milk.gui import GUI
+from thread_runner import ThreadRunner
 from .lua_syntax_checker import LuaSyntaxChecker
 
 
@@ -63,7 +63,6 @@ class SyntaxInspectionView(_View):
         super(SyntaxInspectionView, self).__init__()
 
         self.row_info = []
-        self.thread: Optional[Cmm.StoppableThread] = None
 
         self.setWindowTitle(LangUI.lua_grammar_title)
         self.setMinimumSize(640, 480)
@@ -87,11 +86,6 @@ class SyntaxInspectionView(_View):
             settings.setValue(UserKey.LuaGrammar.folder_at, at)
         else:
             return settings.value(UserKey.LuaGrammar.folder_at, Cmm.user_document_dir(), str)
-
-    def closeEvent(self, event):
-        if self.thread is not None:
-            self.thread.stop()
-        super(SyntaxInspectionView, self).closeEvent(event)
 
     def on_select_folder(self):
         chosen = GUI.dialog_for_directory_selection(self, LangUI.lua_grammar_folder_at, self.lua_grammar_folder_at())
@@ -141,21 +135,16 @@ class SyntaxInspectionView(_View):
     def check_all(self, files: List[str]):
         files.reverse()
 
-        def check_one():
-            while len(files) > 0:
-                where = files.pop()
-                self.check_one(where)
-                sleep(0.015)
+        def on_running():
+            if len(files) == 0:
+                self.set_widgets_enabled(True)
+                runner.stop(tid)
+                return
+            where = files.pop()
+            self.check_one(where)
 
-            if self.thread:
-                self.thread.stop()
-                self.thread = None
-
-            self.set_widgets_enabled(True)
-
-        self.thread = Cmm.StoppableThread(target=check_one)
-        self.thread.daemon = True
-        self.thread.start()
+        runner = ThreadRunner()
+        tid = runner.start(runner=on_running)
 
     def check_one(self, where: str):
         ok, blocks = LuaSyntaxChecker.check_nested(where)

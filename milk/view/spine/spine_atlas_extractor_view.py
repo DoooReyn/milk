@@ -2,7 +2,6 @@ import re
 from os import makedirs, walk
 from os.path import dirname, exists, isdir, join, splitext
 from shutil import rmtree
-from time import sleep
 
 from PIL import Image
 from PyQt5.QtCore import Qt
@@ -10,6 +9,7 @@ from PyQt5.QtCore import Qt
 from milk.cmm import Cmm
 from milk.conf import LangUI, settings, signals, UIDef, UserKey
 from milk.gui import GUI
+from milk.thread_runner import ThreadRunner
 
 
 class _View(GUI.View):
@@ -133,20 +133,18 @@ class SpineAtlasExtractorView(_View):
         if len(file_no) <= 0:
             signals.logger_error.emit(LangUI.msg_atlas_not_found)
         else:
-            def _run():
-                while len(file_no) > 0:
-                    src, dst = file_no.pop()
-                    self._parse_file(src, dst)
-                    sleep(1)
-                self.thread.stop()
-                self.thread = None
-                self.reset_ui(True)
-                signals.logger_info.emit(LangUI.msg_all_extracted.format(locate))
-                signals.window_switch_to_main.emit()
+            def on_running():
+                if len(file_no) == 0:
+                    runner.stop(tid)
+                    self.reset_ui(True)
+                    signals.logger_info.emit(LangUI.msg_all_extracted.format(locate))
+                    signals.window_switch_to_main.emit()
+                    return
+                src, dst = file_no.pop()
+                self._parse_file(src, dst)
 
-            self.thread = Cmm.StoppableThread(target=_run)
-            self.thread.daemon = True
-            self.thread.start()
+            runner = ThreadRunner()
+            tid = runner.start(runner=on_running)
 
     def reset_ui(self, ok: bool):
         self.ui_btn_parse.setEnabled(ok)
