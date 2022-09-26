@@ -41,7 +41,7 @@ class TextureUnpackerView(_View):
         self.plist_data: Optional[dict] = None
         self.setWindowTitle(LangUI.texture_unpacker_title)
 
-        self.setup_resize_keys(UserKey.TextureUnpacker.window_width, UserKey.TextureUnpacker.window_height)
+        self.setup_rect_key(UserKey.TextureUnpacker.window_rect)
         self.setup_window_code(UIDef.ImageTextureUnpacker.value)
         self.setup_ui_signals()
 

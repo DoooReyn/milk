@@ -68,7 +68,7 @@ class SyntaxInspectionView(_View):
         self.setWindowTitle(LangUI.lua_grammar_title)
         self.setMinimumSize(640, 480)
         self.setup_window_code(UIDef.LuaGrammarChecker.value)
-        self.setup_resize_keys(UserKey.LuaGrammar.window_width, UserKey.LuaGrammar.window_height)
+        self.setup_rect_key(UserKey.LuaGrammar.window_rect)
         self.setup_preferences()
         self.setup_ui_signals()
 

@@ -63,7 +63,7 @@ class EncodingDetectionView(_View):
         self.setMinimumSize(GUI.view_size())
 
         self.setup_window_code(UIDef.LuaEncodingChecker.value)
-        self.setup_resize_keys(UserKey.LuaEncodingDetection.window_width, UserKey.LuaEncodingDetection.window_height)
+        self.setup_rect_key(UserKey.LuaEncodingDetection.window_rect)
         self.setup_ui_signals()
         self.ui_edit_choose.setText(self.last_at())
 

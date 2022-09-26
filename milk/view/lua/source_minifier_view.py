@@ -58,7 +58,6 @@ class SourceMinifierView(_View):
         self.setWindowTitle(LangUI.lua_minifier_title)
         self.setMinimumSize(640, 480)
         self.setup_window_code(UIDef.LuaMinifier.value)
-        self.setup_resize_keys(UserKey.LuaMinifier.window_width, UserKey.LuaGrammar.window_height)
         self.setup_rect_key(UserKey.LuaMinifier.window_rect)
         self.setup_preferences()
         self.setup_ui_signals()

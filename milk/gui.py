@@ -55,31 +55,8 @@ class GUI:
             event.accept()
             super().closeEvent(event)
 
-        def resizeEvent(self, event):
-            self.set_win_size(self.width(), self.height())
-            event.accept()
-            super().resizeEvent(event)
-
         def setup_window_code(self, code: int):
             self.window_code = code
-
-        def setup_resize_keys(self, kw: str, kh: str):
-            self.resize_keys = (kw, kh,)
-            w, h = self.get_win_size()
-            self.resize(w, h)
-
-        def get_win_size(self):
-            if self.resize_keys is not None:
-                kw, kh = self.resize_keys
-                return settings.value(kw, 640, int), settings.value(kh, 480, int)
-            else:
-                return self.width(), self.height()
-
-        def set_win_size(self, width: int, height: int):
-            if self.resize_keys is not None:
-                kw, kh = self.resize_keys
-                settings.setValue(kw, width)
-                settings.setValue(kh, height)
 
         def setup_rect_key(self, kr: str):
             self.rect_key = kr
@@ -88,7 +65,7 @@ class GUI:
 
         def get_win_rect(self):
             if self.rect_key is not None:
-                return [int(v) for v in settings.value(self.rect_key, '640,960,1280,480', str).split(',')]
+                return [int(v) for v in settings.value(self.rect_key, '640,640,640,480', str).split(',')]
             else:
                 r = self.geometry()
                 return r.topLeft().x(), r.topLeft().y(), r.width(), r.height()

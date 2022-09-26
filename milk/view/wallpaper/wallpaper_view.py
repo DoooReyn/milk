@@ -86,7 +86,7 @@ class WallPaperView(_View):
         self.setWindowTitle(LangUI.wallpaper_title)
 
         self.setup_window_code(UIDef.ToolsWallpaper.value)
-        self.setup_resize_keys(UserKey.Wallpaper.window_width, UserKey.Wallpaper.window_height)
+        self.setup_rect_key(UserKey.Wallpaper.window_rect)
         self.setMinimumSize(500, 184)
         self.setup_ui_signals()
         self.setup_preferences()

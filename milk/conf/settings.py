@@ -270,8 +270,7 @@ class UserKey:
         public_key = "tools:wallpaper:public_key"
         private_key = "tools:wallpaper:private_key"
         redirect_uri = "tools:wallpaper:redirect_uri"
-        window_width = "tools:wallpaper:window_width"
-        window_height = "tools:wallpaper:window_height"
+        window_rect = "tools:wallpaper:window_rect"
         save_at = "tools:wallpaper:save_at"
 
     class Main:
@@ -285,36 +284,29 @@ class UserKey:
     class SpineAtlasExtractor:
         atlas_locate_dir = "texture:spine:atlas:atlas_locate_dir"
         atlas_out_dir = "texture:spine:atlas:atlas_out_dir"
-        window_width = "texture:spine:atlas::window_width"
-        window_height = "texture:spine:atlas::window_height"
+        window_rect = "texture:spine:atlas:window_rect"
 
     class TextureUnpacker:
         last_save_at = "texture:unpacker:last_save_at"
-        window_width = "texture:unpacker:window_width"
-        window_height = "texture:unpacker:window_height"
+        window_rect = "texture:unpacker:window_rect"
 
     class Translator:
         ctranslate2_model = "tools:translator:ctranslate2_model"
         sentence_piece_model = "tools:translator:sentence_piece_model"
         fasttext_model = "tools:translator:fasttext_model"
-        window_width = "tools:translator:window_width"
-        window_height = "tools:translator:window_height"
+        window_rect = "tools:translator:window_rect"
 
     class LuaEncodingDetection:
         last_dir = "lua:encoding:last_dir"
-        window_width = "lua:encoding:window_width"
-        window_height = "lua:encoding:window_height"
+        window_rect = "lua:encoding:window_rect"
 
     class LuaGrammar:
         folder_at = "lua:grammar:folder_at"
-        window_width = "lua:grammar:window_width"
-        window_height = "lua:grammar:window_height"
+        window_rect = "lua:grammar:window_rect"
 
     class LuaMinifier:
         folder_at = "lua:minifier:folder_at"
         window_rect = "lua:minifier:window_rect"
-        window_width = "lua:minifier:window_width"
-        window_height = "lua:minifier:window_height"
 
 
 local_dir = QStandardPaths.writableLocation(QStandardPaths.AppConfigLocation)
